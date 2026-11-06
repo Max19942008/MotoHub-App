@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
+import 'api/auth_service.dart';
+import 'screens/assistant_screen.dart';
 import 'screens/motorbikes_screen.dart';
 import 'screens/parts_screen.dart';
+import 'screens/profile_screen.dart';
 
-void main() => runApp(const MotoHubApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AuthService.instance.init(); // restore a saved session before the first request
+  runApp(const MotoHubApp());
+}
 
 const _brand = Color(0xFFE8462B);
 
@@ -45,7 +52,7 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _tab = 0;
 
-  static const _titles = ['Mototsikllar', 'Qismlar'];
+  static const _titles = ['Mototsikllar', 'Qismlar', 'AI yordamchi', 'Profil'];
 
   @override
   Widget build(BuildContext context) {
@@ -59,21 +66,38 @@ class _HomeShellState extends State<HomeShell> {
             const SizedBox(width: 8),
             Text('MotoHub', style: TextStyle(fontWeight: FontWeight.w800, color: scheme.primary)),
             const SizedBox(width: 8),
-            Text('· ${_titles[_tab]}', style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 16)),
+            ListenableBuilder(
+              listenable: AuthService.instance,
+              builder: (context, _) => Text(
+                '· ${_tab == 3 && !AuthService.instance.isLoggedIn ? 'Kirish' : _titles[_tab]}',
+                style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 16),
+              ),
+            ),
           ],
         ),
       ),
       body: IndexedStack(
         index: _tab,
-        children: const [MotorbikesScreen(), PartsScreen()],
+        children: const [MotorbikesScreen(), PartsScreen(), AssistantScreen(), ProfileScreen()],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
-        onDestinationSelected: (i) => setState(() => _tab = i),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.two_wheeler_outlined), selectedIcon: Icon(Icons.two_wheeler), label: 'Mototsikllar'),
-          NavigationDestination(icon: Icon(Icons.build_outlined), selectedIcon: Icon(Icons.build), label: 'Qismlar'),
-        ],
+      bottomNavigationBar: ListenableBuilder(
+        listenable: AuthService.instance,
+        builder: (context, _) => NavigationBar(
+          selectedIndex: _tab,
+          onDestinationSelected: (i) => setState(() => _tab = i),
+          destinations: [
+            const NavigationDestination(
+                icon: Icon(Icons.two_wheeler_outlined), selectedIcon: Icon(Icons.two_wheeler), label: 'Mototsikllar'),
+            const NavigationDestination(icon: Icon(Icons.build_outlined), selectedIcon: Icon(Icons.build), label: 'Qismlar'),
+            const NavigationDestination(
+                icon: Icon(Icons.smart_toy_outlined), selectedIcon: Icon(Icons.smart_toy), label: 'AI yordamchi'),
+            NavigationDestination(
+              icon: const Icon(Icons.person_outline),
+              selectedIcon: const Icon(Icons.person),
+              label: AuthService.instance.isLoggedIn ? 'Profil' : 'Kirish',
+            ),
+          ],
+        ),
       ),
     );
   }
