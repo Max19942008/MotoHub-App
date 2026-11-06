@@ -16,3 +16,7 @@ String imageUrl(String? path) {
 }
 
 const int pageSize = 10;
+
+/// Public website — privacy policy and account deletion pages (linked from Google Play).
+const String siteUrl = 'https://ignition-plum.vercel.app';
+const String privacyUrl = '$siteUrl/privacy';

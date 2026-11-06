@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../api/auth_service.dart';
 import '../api/graphql_client.dart';
+import '../config.dart';
 import '../widgets/common.dart';
 
 /// Login / signup for guests, profile + logout for members.
@@ -37,6 +39,36 @@ class _ProfileView extends StatelessWidget {
       ),
     );
     if (ok == true) await AuthService.instance.logout();
+  }
+
+  Future<void> _deleteAccount(BuildContext context) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error),
+        title: const Text('Hisobni o\'chirish'),
+        content: const Text(
+          'Hisobingiz butunlay o\'chiriladi: barcha qurilmalardagi sessiyalar yopiladi, '
+          'e\'lonlaringiz va maqolalaringiz saytdan olib tashlanadi. Buni qaytarib bo\'lmaydi.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Bekor qilish')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('O\'chirish'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await AuthService.instance.deleteAccount();
+      messenger.showSnackBar(const SnackBar(content: Text('Hisobingiz o\'chirildi')));
+    } on ApiException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    }
   }
 
   @override
@@ -82,6 +114,14 @@ class _ProfileView extends StatelessWidget {
           icon: const Icon(Icons.logout),
           label: const Text('Chiqish'),
         ),
+        const SizedBox(height: 8),
+        TextButton.icon(
+          style: TextButton.styleFrom(foregroundColor: scheme.error),
+          onPressed: () => _deleteAccount(context),
+          icon: const Icon(Icons.delete_forever_outlined),
+          label: const Text('Hisobni o\'chirish'),
+        ),
+        const _PrivacyLink(),
       ],
     );
   }
@@ -258,7 +298,21 @@ class _AuthFormState extends State<_AuthForm> {
               ? const SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2.5))
               : Text(_signup ? 'Ro\'yxatdan o\'tish' : 'Kirish'),
         ),
+        const SizedBox(height: 12),
+        const _PrivacyLink(),
       ],
+    );
+  }
+}
+
+class _PrivacyLink extends StatelessWidget {
+  const _PrivacyLink();
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () => launchUrl(Uri.parse(privacyUrl), mode: LaunchMode.externalApplication),
+      child: const Text('Maxfiylik siyosati'),
     );
   }
 }

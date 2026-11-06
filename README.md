@@ -12,6 +12,7 @@ It talks to the same backend as the website ([MotoHub API](https://github.com/Ma
 - **Login / sign up** with the same account as the website; tokens kept in the Android keystore and refreshed silently
 - **AI assistant** — ask in Uzbek, Russian or English; answers come from MotoHub listings (RAG on the backend) with tappable listing cards
 - Friendly wait message while the free Render backend wakes up (~50 s)
+- Account deletion inside the app (Google Play requirement)
 - Light and dark theme
 
 ## Run
@@ -22,11 +23,28 @@ flutter run                     # uses the deployed backend
 flutter run --dart-define=API_URL=http://10.0.2.2:3007   # local backend from the emulator (debug builds allow http)
 ```
 
-Build an APK:
+Build for Google Play:
 
 ```bash
-flutter build apk --release     # build/app/outputs/flutter-apk/app-release.apk
+flutter build appbundle --release   # build/app/outputs/bundle/release/app-release.aab
 ```
+
+Release builds are signed with the upload key from `android/key.properties` (not in git):
+
+```properties
+storePassword=...
+keyPassword=...
+keyAlias=upload
+storeFile=C:/path/to/motohub-upload.jks
+```
+
+Without that file the release build falls back to the debug key (fine for `flutter run --release`, rejected by Play).
+
+Play listing assets are in `store/` (512 px icon, 1024×500 feature graphic). Launcher icons are generated from `assets/icon/` with `dart run flutter_launcher_icons`.
+
+- Package name: `uz.motohub.app`
+- Privacy policy: https://ignition-plum.vercel.app/privacy
+- Account deletion: in the app (Profile → Hisobni o'chirish) and at https://ignition-plum.vercel.app/account/delete
 
 ## Structure
 

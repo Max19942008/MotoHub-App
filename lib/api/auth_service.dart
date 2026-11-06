@@ -108,6 +108,22 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  /// Permanently deletes the account (same as on the website: the backend
+  /// soft-deletes the member, revokes every session and retires their listings).
+  Future<void> deleteAccount() async {
+    final id = _member?.id;
+    if (id == null) return;
+    await _gql.query(
+      r'mutation ($input: MemberUpdate!) { updateMember(input: $input) { _id memberStatus } }',
+      variables: {
+        'input': {'_id': id, 'memberStatus': 'DELETE'},
+      },
+    );
+    // Server already revoked the refresh token; just drop the local session.
+    await _clear();
+    notifyListeners();
+  }
+
   /// Access token for an API call, refreshed first if it expires within a minute.
   /// Returns null for guests, and logs out if the refresh token was rejected.
   Future<String?> validAccessToken() async {
