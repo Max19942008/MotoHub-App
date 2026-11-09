@@ -2,7 +2,7 @@
 ///   flutter run --dart-define=API_URL=http://192.168.1.10:3007
 const String apiUrl = String.fromEnvironment(
   'API_URL',
-  defaultValue: 'https://motohub-ci05.onrender.com',
+  defaultValue: 'https://api.motopresto.online',
 );
 
 const String graphqlUrl = '$apiUrl/graphql';
@@ -18,5 +18,5 @@ String imageUrl(String? path) {
 const int pageSize = 10;
 
 /// Public website — privacy policy and account deletion pages (linked from Google Play).
-const String siteUrl = 'https://ignition-plum.vercel.app';
+const String siteUrl = 'https://motopresto.online';
 const String privacyUrl = '$siteUrl/privacy';
