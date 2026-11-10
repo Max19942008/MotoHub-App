@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 
 import '../api/auth_service.dart';
 import '../api/graphql_client.dart';
@@ -9,6 +9,7 @@ import '../widgets/common.dart';
 import '../widgets/site_sections.dart';
 import 'article_detail_screen.dart';
 import 'write_article_screen.dart';
+import '../i18n/text.dart';
 
 /// The four boards of the site's community page.
 const communityBoards = [

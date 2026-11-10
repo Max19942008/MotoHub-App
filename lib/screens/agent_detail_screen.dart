@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../api/auth_service.dart';
@@ -10,6 +10,7 @@ import '../utils/labels.dart';
 import '../widgets/common.dart';
 import '../widgets/detail_layout.dart';
 import 'motorbike_detail_screen.dart';
+import '../i18n/text.dart';
 
 /// The website's agent page: profile card, then "Bikes (n)" / "Reviews (n)" tabs.
 class AgentDetailScreen extends StatefulWidget {

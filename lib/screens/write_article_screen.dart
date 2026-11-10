@@ -1,10 +1,12 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 
 import '../api/graphql_client.dart';
 import '../api/repository.dart';
 import '../theme.dart';
+import '../i18n/text.dart';
+import '../i18n/i18n.dart';
 
 /// The site's "Write an Article" form: category, title, text, Register.
 /// Pops `true` once the article is published.
@@ -113,7 +115,7 @@ class _WriteArticleScreenState extends State<WriteArticleScreen> {
             controller: _title,
             maxLength: 50,
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(hintText: 'Type Title'),
+            decoration: InputDecoration(hintText: 'Type Title'.tr),
           ),
           const SizedBox(height: 8),
           const Text('Matn', style: label),
@@ -124,8 +126,8 @@ class _WriteArticleScreenState extends State<WriteArticleScreen> {
             maxLines: 18,
             maxLength: 230,
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-                hintText: 'Type here', alignLabelWithHint: true),
+            decoration: InputDecoration(
+                hintText: 'Type here'.tr, alignLabelWithHint: true),
           ),
           const SizedBox(height: 22),
           Center(

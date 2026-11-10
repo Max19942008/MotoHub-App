@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 
 import '../api/graphql_client.dart';
 import '../models/listing.dart';
 import '../theme.dart';
 import 'common.dart';
+import '../i18n/text.dart';
 
 typedef PageFetcher<T> = Future<PageResult<T>> Function(int page);
 

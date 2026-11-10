@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 
 import '../api/graphql_client.dart';
 import '../api/repository.dart';
@@ -6,6 +6,8 @@ import '../models/listing.dart';
 import '../theme.dart';
 import '../utils/labels.dart';
 import '../widgets/common.dart';
+import '../i18n/text.dart';
+import '../i18n/i18n.dart';
 
 /// The site's /notifications page: list, "Mark all read", delete one.
 class NotificationsScreen extends StatefulWidget {
@@ -148,7 +150,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ),
                       ),
                       IconButton(
-                        tooltip: "O'chirish",
+                        tooltip: "O'chirish".tr,
                         icon: const Icon(Icons.delete_outline, size: 20),
                         onPressed: () =>
                             _run(() => _repo.deleteNotification(n.id)),

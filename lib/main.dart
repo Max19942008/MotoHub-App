@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
+import 'package:flutter/material.dart' as m show Text;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'api/auth_service.dart';
@@ -16,12 +17,15 @@ import 'screens/parts_screen.dart';
 import 'screens/profile_screen.dart';
 import 'theme.dart';
 import 'widgets/common.dart';
+import 'i18n/i18n.dart';
+import 'i18n/text.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AuthService.instance
       .init(); // restore a saved session before the first request
-  runApp(const MotoprestoApp());
+  await I18n.instance.init();
+  runApp(I18nScope(child: const MotoprestoApp()));
 }
 
 class MotoprestoApp extends StatelessWidget {
@@ -92,7 +96,7 @@ class _HomeShellState extends State<HomeShell> {
                 else
                   _LoginPill(onTap: () => _go(AppPage.profile)),
                 IconButton(
-                  tooltip: 'Menyu',
+                  tooltip: 'Menyu'.tr,
                   icon: const Icon(Icons.menu, size: 28),
                   onPressed: () => _scaffold.currentState?.openEndDrawer(),
                 ),
@@ -190,7 +194,7 @@ class _BellButtonState extends State<_BellButton> {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      tooltip: 'Bildirishnomalar',
+      tooltip: 'Bildirishnomalar'.tr,
       onPressed: () async {
         await Navigator.push(context,
             MaterialPageRoute(builder: (_) => const NotificationsScreen()));
@@ -213,7 +217,7 @@ class _AvatarButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      tooltip: 'Profil',
+      tooltip: 'Profil'.tr,
       onPressed: onTap,
       icon: Container(
         width: 36,
@@ -327,6 +331,7 @@ class _MenuDrawer extends StatelessWidget {
                 () => launchUrl(Uri.parse(privacyUrl),
                     mode: LaunchMode.externalApplication)),
             const Spacer(),
+            const _LanguageRow(),
             if (loggedIn)
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
@@ -388,6 +393,61 @@ class _AiFab extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// UZ / RU / EN / KR flags at the bottom of the menu, like the site's drawer.
+class _LanguageRow extends StatelessWidget {
+  const _LanguageRow();
+
+  @override
+  Widget build(BuildContext context) {
+    I18nScope.watch(context);
+    final current = I18n.instance.lang;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      decoration: BoxDecoration(
+        border: Border(
+            top: BorderSide(color: Colors.white.withValues(alpha: 0.08))),
+      ),
+      child: Row(
+        children: [
+          for (final l in AppLang.values) ...[
+            if (l != AppLang.values.first) const SizedBox(width: 8),
+            Expanded(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: () => I18n.instance.set(l),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: l == current
+                        ? Brand.green.withValues(alpha: 0.12)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                        color: l == current
+                            ? Brand.green
+                            : Colors.white.withValues(alpha: 0.15)),
+                  ),
+                  child: Column(children: [
+                    Image.asset(l.flagAsset, width: 26),
+                    const SizedBox(height: 4),
+                    m.Text(l.code,
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: l == current
+                                ? Colors.white
+                                : Colors.white.withValues(alpha: 0.8))),
+                  ]),
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 import 'package:image_picker/image_picker.dart';
 
 import '../api/graphql_client.dart';
@@ -7,6 +7,8 @@ import '../models/listing.dart';
 import '../theme.dart';
 import '../utils/labels.dart';
 import '../widgets/common.dart';
+import '../i18n/text.dart';
+import '../i18n/i18n.dart';
 
 const _violet = Color(0xFF667EEA);
 const _purple = Color(0xFF764BA2);
@@ -194,7 +196,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
   // ------------------------------------------------------------ widgets
 
   InputDecoration _decoration(String hint) => InputDecoration(
-        hintText: hint,
+        hintText: hint.tr,
         hintStyle: const TextStyle(color: Color(0xFF999999), fontSize: 14),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 15),

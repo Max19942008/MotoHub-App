@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../api/auth_service.dart';
@@ -11,6 +11,8 @@ import '../theme.dart';
 import '../widgets/common.dart';
 import '../widgets/paged_grid.dart';
 import 'agent_detail_screen.dart';
+import '../i18n/text.dart';
+import '../i18n/i18n.dart';
 
 /// The site's six agent card themes (top bar / ring / AGENT pill).
 const agentThemes = <List<Color>>[
@@ -106,8 +108,8 @@ class _AgentsScreenState extends State<AgentsScreen>
                     _reload();
                   });
                 },
-                decoration: const InputDecoration(
-                  hintText: "Agentlarni ism, manzil bo'yicha qidiring...",
+                decoration: InputDecoration(
+                  hintText: "Agentlarni ism, manzil bo'yicha qidiring...".tr,
                   hintStyle:
                       TextStyle(fontSize: 13.5, color: Color(0xFF9CA3AF)),
                   prefixIcon: Icon(Icons.search, color: Brand.green),

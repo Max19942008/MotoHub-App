@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 
 import '../data/faq.dart';
 import '../theme.dart';
 import '../widgets/site_sections.dart';
+import '../i18n/text.dart';
 
 const _violet = Color(0xFF667EEA);
 const _purple = Color(0xFF764BA2);

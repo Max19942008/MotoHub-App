@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 
 import '../api/repository.dart';
 import '../theme.dart';
 import '../utils/labels.dart';
+import '../i18n/text.dart';
 
 /// Website-style controls of the list header card: a full-width sort button
 /// and a wrap of filter buttons, each opening a small dropdown menu.

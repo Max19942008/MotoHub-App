@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../api/auth_service.dart';
@@ -9,6 +9,7 @@ import '../screens/agent_detail_screen.dart';
 import '../theme.dart';
 import '../utils/labels.dart';
 import 'common.dart';
+import '../i18n/text.dart';
 
 /// Colored icon tile in the "options" box (Dvigatel, Yurgan masofa, …).
 class Spec {

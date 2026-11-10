@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 
 import '../theme.dart';
 import 'common.dart';
+import '../i18n/text.dart';
 
 /// The site's rating text: home cards show the rank with two decimals, list
 /// cards show rank / 10 with one; an unranked listing reads "4.6" on both.

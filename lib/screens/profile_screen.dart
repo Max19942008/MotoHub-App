@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../api/auth_service.dart';
@@ -6,6 +6,8 @@ import '../api/graphql_client.dart';
 import '../config.dart';
 import '../widgets/site_sections.dart';
 import 'my_page_screen.dart';
+import '../i18n/text.dart';
+import '../i18n/i18n.dart';
 
 /// Login / signup for guests, profile + logout for members.
 class ProfileScreen extends StatelessWidget {
@@ -95,8 +97,8 @@ class _AuthFormState extends State<_AuthForm> {
   InputDecoration _input(String label, String hint, IconData icon,
           {Widget? suffix}) =>
       InputDecoration(
-        labelText: label,
-        hintText: hint,
+        labelText: label.tr,
+        hintText: hint.tr,
         floatingLabelBehavior: FloatingLabelBehavior.always,
         labelStyle: const TextStyle(
             fontWeight: FontWeight.w600, color: Color(0xFF475569)),

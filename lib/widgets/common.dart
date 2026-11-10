@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 
 import '../config.dart';
+import '../i18n/text.dart';
 
 /// Network image with a neutral placeholder when the URL is empty or broken
 /// (old uploads on the free Render instance are gone, so this is common).

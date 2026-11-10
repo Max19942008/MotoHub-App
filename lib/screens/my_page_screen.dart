@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -18,6 +18,8 @@ import 'article_detail_screen.dart';
 import 'community_screen.dart';
 import 'motorbike_detail_screen.dart';
 import 'part_detail_screen.dart';
+import '../i18n/text.dart';
+import '../i18n/i18n.dart';
 
 const _violet = Color(0xFF667EEA);
 const _purple = Color(0xFF764BA2);
@@ -744,17 +746,20 @@ class _Count extends StatelessWidget {
   final int value;
 
   @override
-  Widget build(BuildContext context) => Expanded(
-        child: Text.rich(TextSpan(children: [
-          TextSpan(
-              text: '$label ',
-              style: const TextStyle(fontSize: 13, color: _muted)),
-          TextSpan(
-              text: '($value)',
-              style: const TextStyle(
-                  fontSize: 13, fontWeight: FontWeight.w700, color: Brand.ink)),
-        ])),
-      );
+  Widget build(BuildContext context) {
+    I18nScope.watch(context);
+    return Expanded(
+      child: Text.rich(TextSpan(children: [
+        TextSpan(
+            text: '${label.tr} ',
+            style: const TextStyle(fontSize: 13, color: _muted)),
+        TextSpan(
+            text: '($value)',
+            style: const TextStyle(
+                fontSize: 13, fontWeight: FontWeight.w700, color: Brand.ink)),
+      ])),
+    );
+  }
 }
 
 // ---------------------------------------------------------------- articles
@@ -955,7 +960,7 @@ class _ProfileSectionState extends State<_ProfileSection> {
             controller: c,
             keyboardType: keyboard,
             decoration: InputDecoration(
-              hintText: hint,
+              hintText: hint.tr,
               hintStyle: const TextStyle(color: Color(0xFFA0A0A0)),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 18, vertical: 17),

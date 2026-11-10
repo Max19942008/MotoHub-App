@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 
 import '../api/repository.dart';
 import '../models/listing.dart';
@@ -8,6 +8,7 @@ import '../widgets/listing_card.dart';
 import '../widgets/site_sections.dart';
 import 'motorbike_detail_screen.dart';
 import 'part_detail_screen.dart';
+import '../i18n/text.dart';
 
 /// The website's mobile home page, section for section.
 class HomeScreen extends StatefulWidget {
@@ -143,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen>
         children: [
           const HomeHero(),
           SiteSection(
-            title: titleCase("Eng ko'p qidirilgan mototsikllar"),
+            title: "Eng ko'p qidirilgan mototsikllar",
             subtitle: 'Trend yoqtirishlarga asoslangan',
             emoji: '🔥',
             gradient: _greenTitle,
@@ -152,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen>
                 (Motorbike b) => _bikeCard(b, CardAccent.green, 'Sotib Olish')),
           ),
           SiteSection(
-            title: titleCase('Ommabop mototsikllar'),
+            title: 'Ommabop mototsikllar',
             subtitle: "Shu haftada eng ko'p ko'rilgan mototsikllar",
             emoji: '🔥  🔥',
             gradient: _indigoTitle,
@@ -166,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen>
           ),
           const AdvertisementVideo(),
           SiteSection(
-            title: titleCase("Eng zo'r mototsikllar"),
+            title: "Eng zo'r mototsikllar",
             subtitle: 'Shu oyning eng yuqori baholangan mototsikllari',
             emoji: '🏆  🏆',
             gradient: _indigoTitle,
@@ -178,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen>
                     _bikeCard(b, CardAccent.indigo, 'Band Qilish')),
           ),
           SiteSection(
-            title: titleCase("Eng zo'r ehtiyot qismlar"),
+            title: "Eng zo'r ehtiyot qismlar",
             subtitle: 'Shu oyning eng ommabop ehtiyot qismlari',
             emoji: '🏆  🏆',
             gradient: _indigoTitle,
@@ -186,14 +187,14 @@ class _HomeScreenState extends State<HomeScreen>
             child: _carousel(_topParts, Brand.indigo, h, _partCard),
           ),
           SiteSection(
-            title: titleCase("Eng zo'r aksessuarlar"),
+            title: "Eng zo'r aksessuarlar",
             subtitle: 'Shu oyning eng ommabop aksessuarlari',
             emoji: '🏆  🏆',
             gradient: _indigoTitle,
             child: _carousel(_topAccessories, Brand.indigo, h, _partCard),
           ),
           SiteSection(
-            title: titleCase('Elita haydovchilar'),
+            title: 'Elita haydovchilar',
             subtitle: 'Hamjamiyatimiz chempionlari bilan tanishing',
             emoji: '⭐  ⭐',
             gradient: _indigoTitle,
@@ -208,9 +209,3 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 }
-
-/// "eng ko'p qidirilgan" -> "Eng Ko'p Qidirilgan" (CSS text-transform: capitalize).
-String titleCase(String s) => s
-    .split(' ')
-    .map((w) => w.isEmpty ? w : w[0].toUpperCase() + w.substring(1))
-    .join(' ');

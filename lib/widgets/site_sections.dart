@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
@@ -7,6 +7,8 @@ import '../models/listing.dart';
 import '../screens/agent_detail_screen.dart';
 import '../theme.dart';
 import 'common.dart';
+import '../i18n/text.dart';
+import '../i18n/i18n.dart';
 
 /// Videos the website plays (served from the site itself).
 const heroVideos = [
@@ -182,6 +184,8 @@ class SiteSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Title / subtitle are composed here, so translate before composing.
+    I18nScope.watch(context);
     return ColoredBox(
       color: background,
       child: Padding(
@@ -194,7 +198,7 @@ class SiteSection extends StatelessWidget {
               child: ShaderMask(
                 shaderCallback: (r) =>
                     LinearGradient(colors: gradient).createShader(r),
-                child: Text(title,
+                child: Text(_titleCase(title.tr),
                     style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
@@ -211,7 +215,7 @@ class SiteSection extends StatelessWidget {
                   color: underline ?? gradient.first,
                   borderRadius: BorderRadius.circular(2)),
             ),
-            Text('$emoji  $subtitle',
+            Text('$emoji  ${subtitle.tr}',
                 style: const TextStyle(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w500,
@@ -591,7 +595,7 @@ class SiteFooter extends StatelessWidget {
                 TextField(
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    hintText: 'Email manzilingizni kiriting',
+                    hintText: 'Email manzilingizni kiriting'.tr,
                     hintStyle: const TextStyle(color: Color(0xFF6B7280)),
                     fillColor: Colors.white.withValues(alpha: 0.06),
                     enabledBorder: OutlineInputBorder(
@@ -656,3 +660,9 @@ class SiteFooter extends StatelessWidget {
     );
   }
 }
+
+/// "Eng ko'p qidirilgan" -> "Eng Ko'p Qidirilgan", the site's section heading case.
+String _titleCase(String s) => s
+    .split(' ')
+    .map((w) => w.isEmpty ? w : w[0].toUpperCase() + w.substring(1))
+    .join(' ');

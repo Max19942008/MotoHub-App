@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 
 import '../api/repository.dart';
 import '../models/listing.dart';
@@ -8,6 +8,7 @@ import '../widgets/listing_card.dart';
 import '../widgets/paged_grid.dart';
 import '../widgets/site_filters.dart';
 import 'part_detail_screen.dart';
+import '../i18n/text.dart';
 
 /// The website's parts page: "Hammasi / Ehtiyot qismlar / Aksessuarlar" pills,
 /// header card with sort + filter buttons, then cards.

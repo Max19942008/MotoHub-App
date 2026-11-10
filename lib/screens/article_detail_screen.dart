@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 
 import '../api/auth_service.dart';
 import '../api/graphql_client.dart';
@@ -8,6 +8,8 @@ import '../theme.dart';
 import '../utils/labels.dart';
 import '../widgets/common.dart';
 import 'community_screen.dart';
+import '../i18n/text.dart';
+import '../i18n/i18n.dart';
 
 const _indigo = Color(0xFF6366F1);
 const _cardShadow = [
@@ -345,7 +347,7 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
             maxLength: 100,
             onChanged: (_) => setState(() {}),
             decoration: InputDecoration(
-              hintText: "Fikringizni baham ko'ring...",
+              hintText: "Fikringizni baham ko'ring...".tr,
               hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
               counterText: '',
               contentPadding:

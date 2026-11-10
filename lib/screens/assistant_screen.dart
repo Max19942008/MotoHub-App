@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Text;
 
 import '../api/assistant.dart';
 import '../api/graphql_client.dart';
@@ -7,6 +7,8 @@ import '../utils/labels.dart';
 import '../widgets/common.dart';
 import 'motorbike_detail_screen.dart';
 import 'part_detail_screen.dart';
+import '../i18n/text.dart';
+import '../i18n/i18n.dart';
 
 const _suggestions = [
   'Toshkentda 10 000\$ gacha mototsikl bormi?',
@@ -162,7 +164,7 @@ class _AssistantScreenState extends State<AssistantScreen>
                     textInputAction: TextInputAction.send,
                     onSubmitted: _send,
                     decoration: InputDecoration(
-                      hintText: 'Mototsikl yoki qism haqida so\'rang…',
+                      hintText: 'Mototsikl yoki qism haqida so\'rang…'.tr,
                       counterText: '',
                       filled: true,
                       fillColor: scheme.surfaceContainerHighest,
@@ -178,7 +180,7 @@ class _AssistantScreenState extends State<AssistantScreen>
                 IconButton.filled(
                   onPressed: _sending ? null : () => _send(_input.text),
                   icon: const Icon(Icons.send),
-                  tooltip: 'Yuborish',
+                  tooltip: 'Yuborish'.tr,
                 ),
               ],
             ),
@@ -421,8 +423,8 @@ class _ReportSheetState extends State<_ReportSheet> {
             maxLength: 500,
             maxLines: 3,
             minLines: 1,
-            decoration: const InputDecoration(
-                labelText: 'Izoh (ixtiyoriy)', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+                labelText: 'Izoh (ixtiyoriy)'.tr, border: OutlineInputBorder()),
           ),
           if (_error != null)
             Padding(
