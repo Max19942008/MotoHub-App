@@ -16,6 +16,7 @@ class PagedGrid<T> extends StatefulWidget {
     required this.fetch,
     required this.itemBuilder,
     this.header,
+    this.top,
     this.title,
     this.emptyMessage = 'Hech narsa topilmadi',
   });
@@ -23,6 +24,9 @@ class PagedGrid<T> extends StatefulWidget {
   final PageFetcher<T> fetch;
   final Widget Function(BuildContext context, T item) itemBuilder;
   final Widget? header;
+
+  /// Shown above the header card (the parts page category pills).
+  final Widget? top;
 
   /// Big page title in the header card, e.g. "Mototsikllar".
   final String? title;
@@ -106,10 +110,10 @@ class _PagedGridState<T> extends State<PagedGrid<T>> {
       );
     } else {
       body = SliverPadding(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 16),
         sliver: SliverList.separated(
           itemCount: _items.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          separatorBuilder: (_, __) => const SizedBox(height: 20),
           itemBuilder: (context, i) => Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 560),
@@ -126,6 +130,7 @@ class _PagedGridState<T> extends State<PagedGrid<T>> {
         controller: _scroll,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
+          if (widget.top != null) SliverToBoxAdapter(child: widget.top),
           if (widget.title != null)
             SliverToBoxAdapter(child: _HeaderCard(title: widget.title!, total: _total, child: widget.header))
           else if (widget.header != null)
@@ -159,11 +164,10 @@ class _HeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
+        padding: const EdgeInsets.fromLTRB(16, 22, 16, 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -172,14 +176,10 @@ class _HeaderCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, color: Brand.ink)),
-            const SizedBox(height: 2),
-            Text('$total mavjud', style: theme.textTheme.bodyMedium?.copyWith(color: Brand.muted)),
-            if (child != null) ...[
-              const Padding(padding: EdgeInsets.only(top: 12), child: Divider(height: 1, color: Brand.line)),
-              child!,
-            ],
+            Text(title, style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w700, color: Brand.ink, height: 1.3)),
+            const SizedBox(height: 6),
+            Text('$total mavjud', style: const TextStyle(fontSize: 13.5, color: Color(0xFF717171), fontWeight: FontWeight.w300)),
+            if (child != null) child!,
           ],
         ),
       ),

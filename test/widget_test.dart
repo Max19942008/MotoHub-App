@@ -3,7 +3,7 @@ import 'package:motohub_app/utils/labels.dart';
 
 void main() {
   test('price formatting groups digits and uses the currency sign', () {
-    expect(formatPrice(12500, 'USD'), '\$12 500');
+    expect(formatPrice(12500, 'USD'), '\$12,500'); // comma, like the website
     expect(formatPrice(85000000, 'UZS'), '85 000 000 so\'m');
     expect(formatPrice(999, 'USD'), '\$999');
   });

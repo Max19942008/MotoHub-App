@@ -16,11 +16,16 @@ class NetImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final url = imageUrl(path);
-    final placeholder = ColoredBox(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      child: Center(
-        child: Icon(Icons.two_wheeler, size: iconSize, color: Theme.of(context).colorScheme.outline),
+    // The site shows an empty light gradient where a photo is missing.
+    const placeholder = DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFFFAFAFA), Color(0xFFE2E2E2)],
+        ),
       ),
+      child: SizedBox.expand(),
     );
     if (url.isEmpty) return placeholder;
     return Image.network(

@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import 'common.dart';
 
+/// The site's rating text: home cards show the rank with two decimals, list
+/// cards show rank / 10 with one; an unranked listing reads "4.6" on both.
+String siteRating(num rank, {bool home = false}) {
+  if (rank <= 0) return '4.6';
+  return home ? rank.toStringAsFixed(2) : (rank / 10).toStringAsFixed(1);
+}
+
 /// One spec pill on a card (mileage, condition, engine…).
 class CardChip {
   const CardChip(this.icon, this.text);
@@ -42,6 +49,7 @@ class ListingCard extends StatelessWidget {
     this.views,
     this.likes,
     this.action = 'Sotib Olish',
+    this.priceLabel = 'DAN',
     this.accent = CardAccent.green,
     required this.onTap,
   });
@@ -58,11 +66,15 @@ class ListingCard extends StatelessWidget {
 
   /// Top-left label on the photo, e.g. "SPORT".
   final String? badge;
-  final num? rating;
+  /// Already formatted, e.g. "20.00" on home or "1.2" in lists (as on the site).
+  final String? rating;
   final List<CardChip> chips;
   final int? views;
   final int? likes;
   final String action;
+
+  /// "DAN" on bikes, "NARX" on parts (as on the site).
+  final String priceLabel;
   final CardAccent accent;
   final VoidCallback onTap;
 
@@ -115,7 +127,7 @@ class ListingCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              kicker.toUpperCase(),
+                              kicker,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -139,7 +151,7 @@ class ListingCard extends StatelessWidget {
                             children: [
                               const Icon(Icons.star_rounded, size: 17, color: Color(0xFFFFC107)),
                               const SizedBox(width: 5),
-                              Text(rating!.toStringAsFixed(rating! >= 10 ? 2 : 1),
+                              Text(rating!,
                                   style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: accent.main)),
                             ],
                           ),
@@ -155,7 +167,7 @@ class ListingCard extends StatelessWidget {
                       children: [
                         Icon(Icons.place, size: 17, color: accent.main),
                         const SizedBox(width: 10),
-                        Text(location.toUpperCase(),
+                        Text(location,
                             style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF374151))),
                         const SizedBox(width: 10),
                         Expanded(
@@ -185,8 +197,8 @@ class ListingCard extends StatelessWidget {
                     padding: EdgeInsets.only(top: 18, bottom: 22),
                     child: Divider(height: 1, color: Color(0xFFEAEAEA)),
                   ),
-                  const Text('DAN',
-                      style: TextStyle(fontSize: 10.5, color: Color(0xFF9CA3AF), fontWeight: FontWeight.w700, letterSpacing: 0.8)),
+                  Text(priceLabel,
+                      style: const TextStyle(fontSize: 10.5, color: Color(0xFF9CA3AF), fontWeight: FontWeight.w700, letterSpacing: 0.8)),
                   Text(price, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: accent.main, height: 1.2)),
                   const SizedBox(height: 10),
                   DecoratedBox(

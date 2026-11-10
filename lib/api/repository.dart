@@ -21,12 +21,12 @@ const _partFields = '''
   $_sellerFields
 ''';
 
-/// Sort options shared by both lists; the backend field differs per entity.
+/// Sort options, same as the website's sort menu.
 enum SortOption {
-  newest('Eng yangi', 'createdAt', 'DESC'),
-  cheapest('Arzonroq', 'Price', 'ASC'),
-  priciest('Qimmatroq', 'Price', 'DESC'),
-  popular('Ommabop', 'Views', 'DESC');
+  recent("So'nggi", 'createdAt', 'DESC'),
+  oldest('Eng eski', 'createdAt', 'ASC'),
+  likes('Yoqtirishlar', 'Likes', 'DESC'),
+  views("Ko'rishlar", 'Views', 'DESC');
 
   const SortOption(this.label, this.field, this.direction);
   final String label;
@@ -46,7 +46,9 @@ class MotorbikeFilter {
     this.locations = const {},
     this.minPrice,
     this.maxPrice,
-    this.sort = SortOption.newest,
+    this.minYear,
+    this.maxYear,
+    this.sort,
   });
 
   final String text;
@@ -56,10 +58,21 @@ class MotorbikeFilter {
   final Set<String> locations;
   final int? minPrice;
   final int? maxPrice;
-  final SortOption sort;
+  final int? minYear;
+  final int? maxYear;
+
+  /// null = not chosen yet (the site's button then reads "Yangi").
+  final SortOption? sort;
+
+  SortOption get effectiveSort => sort ?? SortOption.recent;
 
   int get activeCount =>
-      brands.length + types.length + conditions.length + locations.length + (minPrice != null || maxPrice != null ? 1 : 0);
+      brands.length +
+      types.length +
+      conditions.length +
+      locations.length +
+      (minPrice != null || maxPrice != null ? 1 : 0) +
+      (minYear != null || maxYear != null ? 1 : 0);
 
   MotorbikeFilter copyWith({
     String? text,
@@ -69,6 +82,8 @@ class MotorbikeFilter {
     Set<String>? locations,
     int? Function()? minPrice,
     int? Function()? maxPrice,
+    int? Function()? minYear,
+    int? Function()? maxYear,
     SortOption? sort,
   }) =>
       MotorbikeFilter(
@@ -79,6 +94,8 @@ class MotorbikeFilter {
         locations: locations ?? this.locations,
         minPrice: minPrice != null ? minPrice() : this.minPrice,
         maxPrice: maxPrice != null ? maxPrice() : this.maxPrice,
+        minYear: minYear != null ? minYear() : this.minYear,
+        maxYear: maxYear != null ? maxYear() : this.maxYear,
         sort: sort ?? this.sort,
       );
 
@@ -89,11 +106,13 @@ class MotorbikeFilter {
         if (conditions.isNotEmpty) 'conditionList': conditions.toList(),
         if (locations.isNotEmpty) 'locationList': locations.toList(),
         if (minPrice != null || maxPrice != null)
-          'pricesRange': {'start': minPrice ?? 0, 'end': maxPrice ?? 100000000},
+          'pricesRange': {'start': minPrice ?? 0, 'end': maxPrice ?? 2000000},
+        if (minYear != null || maxYear != null)
+          'yearRange': {'start': minYear ?? 1970, 'end': maxYear ?? DateTime.now().year},
       };
 }
 
-/// Filters for the parts list. [category] is SPARE_PART or ACCESSORY.
+/// Filters for the parts list. [category] is SPARE_PART, ACCESSORY or ALL.
 class PartFilter {
   PartFilter({
     required this.category,
@@ -102,7 +121,9 @@ class PartFilter {
     this.brands = const {},
     this.conditions = const {},
     this.locations = const {},
-    this.sort = SortOption.newest,
+    this.minPrice,
+    this.maxPrice,
+    this.sort,
   });
 
   final String category;
@@ -111,9 +132,14 @@ class PartFilter {
   final Set<String> brands;
   final Set<String> conditions;
   final Set<String> locations;
-  final SortOption sort;
+  final int? minPrice;
+  final int? maxPrice;
+  final SortOption? sort;
 
-  int get activeCount => types.length + brands.length + conditions.length + locations.length;
+  SortOption get effectiveSort => sort ?? SortOption.recent;
+
+  int get activeCount =>
+      types.length + brands.length + conditions.length + locations.length + (minPrice != null || maxPrice != null ? 1 : 0);
 
   PartFilter copyWith({
     String? text,
@@ -121,6 +147,8 @@ class PartFilter {
     Set<String>? brands,
     Set<String>? conditions,
     Set<String>? locations,
+    int? Function()? minPrice,
+    int? Function()? maxPrice,
     SortOption? sort,
   }) =>
       PartFilter(
@@ -130,16 +158,20 @@ class PartFilter {
         brands: brands ?? this.brands,
         conditions: conditions ?? this.conditions,
         locations: locations ?? this.locations,
+        minPrice: minPrice != null ? minPrice() : this.minPrice,
+        maxPrice: maxPrice != null ? maxPrice() : this.maxPrice,
         sort: sort ?? this.sort,
       );
 
   Map<String, dynamic> toSearch() => {
-        'categoryList': [category],
+        if (category != 'ALL') 'categoryList': [category],
         if (text.trim().isNotEmpty) 'text': text.trim(),
         if (types.isNotEmpty) 'typeList': types.toList(),
         if (brands.isNotEmpty) 'brandList': brands.toList(),
         if (conditions.isNotEmpty) 'conditionList': conditions.toList(),
         if (locations.isNotEmpty) 'locationList': locations.toList(),
+        if (minPrice != null || maxPrice != null)
+          'pricesRange': {'start': minPrice ?? 0, 'end': maxPrice ?? 2000000},
       };
 }
 
@@ -161,8 +193,8 @@ class Repository {
       'input': {
         'page': page,
         'limit': pageSize,
-        'sort': filter.sort.fieldFor('property'),
-        'direction': filter.sort.direction,
+        'sort': filter.effectiveSort.fieldFor('property'),
+        'direction': filter.effectiveSort.direction,
         'search': filter.toSearch(),
       },
     });
@@ -236,8 +268,8 @@ class Repository {
       'input': {
         'page': page,
         'limit': pageSize,
-        'sort': filter.sort.fieldFor('part'),
-        'direction': filter.sort.direction,
+        'sort': filter.effectiveSort.fieldFor('part'),
+        'direction': filter.effectiveSort.direction,
         'search': filter.toSearch(),
       },
     });
