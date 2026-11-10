@@ -600,6 +600,8 @@ class Repository {
     return PageResult(
       (result['list'] as List)
           .map((e) => FollowMember.fromJson(e as Map<String, dynamic>, key))
+          // Deleted accounts keep their follow rows as "nick#del#id".
+          .where((f) => !f.nick.contains('#del#'))
           .toList(),
       _total(result),
     );
@@ -628,6 +630,87 @@ class Repository {
       _total(result),
     );
   }
+
+  /// "Mototsikllarim": my own bikes with [status] ACTIVE / HOLD / SOLD.
+  Future<PageResult<Motorbike>> myListings(String status, int page) async {
+    final data = await _gql.query("""
+      query (\$input: AgentPropertiesInquiry!) {
+        getAgentProperties(input: \$input) { list { $_motorbikeFields } metaCounter { total } }
+      }
+    """, variables: {
+      'input': {
+        'page': page,
+        'limit': 5,
+        'sort': 'createdAt',
+        'direction': 'DESC',
+        'search': {'propertyStatus': status},
+      },
+    });
+    final result = data['getAgentProperties'] as Map<String, dynamic>;
+    return PageResult(
+      (result['list'] as List)
+          .map((e) => Motorbike.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      _total(result),
+    );
+  }
+
+  /// "Qismlarim": my own parts with [status] ACTIVE / HOLD / SOLD.
+  Future<PageResult<Part>> myParts(String status, int page) async {
+    final data = await _gql.query("""
+      query (\$input: AgentPartsInquiry!) {
+        getAgentParts(input: \$input) { list { $_partFields } metaCounter { total } }
+      }
+    """, variables: {
+      'input': {
+        'page': page,
+        'limit': 5,
+        'sort': 'createdAt',
+        'direction': 'DESC',
+        'search': {'partStatus': status},
+      },
+    });
+    final result = data['getAgentParts'] as Map<String, dynamic>;
+    return PageResult(
+      (result['list'] as List)
+          .map((e) => Part.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      _total(result),
+    );
+  }
+
+  /// New bike ([id] null) or an edit of my bike; [fields] use the API names.
+  Future<void> saveMotorbike(Map<String, dynamic> fields, {String? id}) => id ==
+          null
+      ? _gql.query(
+          r'mutation ($input: PropertyInput!) { createProperty(input: $input) { _id } }',
+          variables: {
+              'input': fields
+            })
+      : _gql.query(
+          r'mutation ($input: PropertyUpdate!) { updateProperty(input: $input) { _id } }',
+          variables: {
+              'input': {'_id': id, ...fields}
+            });
+
+  Future<void> savePart(Map<String, dynamic> fields, {String? id}) => id == null
+      ? _gql.query(
+          r'mutation ($input: PartInput!) { createPart(input: $input) { _id } }',
+          variables: {
+              'input': fields
+            })
+      : _gql.query(
+          r'mutation ($input: PartUpdate!) { updatePart(input: $input) { _id } }',
+          variables: {
+              'input': {'_id': id, ...fields}
+            });
+
+  /// Archive (SOLD), re-list (ACTIVE) or delete (DELETE) one of my listings.
+  Future<void> setListingStatus(String id, String status,
+          {bool part = false}) =>
+      part
+          ? savePart({'partStatus': status}, id: id)
+          : saveMotorbike({'propertyStatus': status}, id: id);
 
   Future<String> uploadImage(String filePath, String target) =>
       _gql.uploadImage(filePath, target);

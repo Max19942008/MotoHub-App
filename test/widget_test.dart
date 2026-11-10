@@ -15,6 +15,7 @@ void main() {
   });
 
   test('rich-text descriptions become plain text', () {
-    expect(plainText('<p>Yaxshi&nbsp;holatda</p><p>Bir egasi</p>'), 'Yaxshi holatda\nBir egasi');
+    expect(plainText('<p>Yaxshi&nbsp;holatda</p><p>Bir egasi</p>'),
+        'Yaxshi holatda\nBir egasi');
   });
 }

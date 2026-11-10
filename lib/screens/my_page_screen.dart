@@ -12,16 +12,22 @@ import '../utils/labels.dart';
 import '../widgets/common.dart';
 import '../widgets/listing_card.dart';
 import '../widgets/site_sections.dart';
+import 'add_listing_screen.dart';
 import 'agent_detail_screen.dart';
 import 'article_detail_screen.dart';
 import 'community_screen.dart';
 import 'motorbike_detail_screen.dart';
+import 'part_detail_screen.dart';
 
 const _violet = Color(0xFF667EEA);
 const _purple = Color(0xFF764BA2);
 const _muted = Color(0xFF717171);
 
 enum MySection {
+  addBike("E'lon qo'shish", Icons.add_box_outlined),
+  myBikes('Mening mototsikllarim', Icons.two_wheeler),
+  addPart("Qism qo'shish", Icons.add_circle_outline),
+  myParts('Mening qismlarim', Icons.build_outlined),
   favorites('Sevimlilarim', Icons.favorite_border),
   visited("Yaqinda ko'rilganlar", Icons.manage_search),
   followers('Obunachilarim', Icons.group_add_outlined),
@@ -51,6 +57,13 @@ class _MyPageScreenState extends State<MyPageScreen> {
   Future<void> _pick(MySection s) async {
     if (s == MySection.write) {
       await openWriteArticle(context);
+      return;
+    }
+    if (s == MySection.addBike || s == MySection.addPart) {
+      final part = s == MySection.addPart;
+      final saved = await Navigator.push<bool>(context,
+          MaterialPageRoute(builder: (_) => AddListingScreen(isPart: part)));
+      if (saved == true) _pick(part ? MySection.myParts : MySection.myBikes);
       return;
     }
     setState(() => _section = s);
@@ -132,7 +145,14 @@ class _MyPageScreenState extends State<MyPageScreen> {
                           followers: false,
                           key: const ValueKey('followings')),
                       MySection.articles => _ArticlesSection(memberId: m.id),
-                      MySection.write => const SizedBox.shrink(),
+                      MySection.myBikes => const _ListingsSection(
+                          part: false, key: ValueKey('myBikes')),
+                      MySection.myParts => const _ListingsSection(
+                          part: true, key: ValueKey('myParts')),
+                      MySection.write ||
+                      MySection.addBike ||
+                      MySection.addPart =>
+                        const SizedBox.shrink(),
                     },
                   ),
                 ],
@@ -235,6 +255,13 @@ class _MenuCard extends StatelessWidget {
             ]),
           ),
           title('MANAGE LISTINGS'),
+          // Dealers manage their own bikes and parts here, as on the site.
+          if (member.isAgent) ...[
+            item(MySection.addBike),
+            item(MySection.myBikes),
+            item(MySection.addPart),
+            item(MySection.myParts),
+          ],
           item(MySection.favorites),
           item(MySection.visited),
           item(MySection.followers),
@@ -1085,6 +1112,290 @@ class _ProfileSectionState extends State<_ProfileSection> {
           child: const Text('Maxfiylik siyosati'),
         ),
       ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------- my listings
+
+/// "My Bikes" / "My Parts": Active / Blocked / Archived tabs, edit, archive,
+/// re-list and delete, like the site's garage page.
+class _ListingsSection extends StatefulWidget {
+  const _ListingsSection({super.key, required this.part});
+  final bool part;
+
+  @override
+  State<_ListingsSection> createState() => _ListingsSectionState();
+}
+
+class _ListingsSectionState extends State<_ListingsSection> {
+  static const _tabs = [
+    ('ACTIVE', 'Faol'),
+    ('HOLD', 'Bloklangan'),
+    ('SOLD', 'Arxivlangan'),
+  ];
+  String _status = 'ACTIVE';
+  int _page = 1;
+  PageResult<Object>? _result;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final repo = Repository.instance;
+      final PageResult<Object> r = widget.part
+          ? await repo.myParts(_status, _page)
+          : await repo.myListings(_status, _page);
+      if (mounted) {
+        setState(() {
+          _result = r;
+          _error = null;
+        });
+      }
+    } on ApiException catch (e) {
+      if (mounted) setState(() => _error = e.message);
+    }
+  }
+
+  Future<void> _setStatus(String id, String status) async {
+    if (status == 'DELETE') {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("E'lonni o'chirish"),
+          content: const Text("Bu e'lon butunlay o'chiriladi."),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Bekor qilish')),
+            FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text("O'chirish")),
+          ],
+        ),
+      );
+      if (ok != true) return;
+    }
+    try {
+      await Repository.instance.setListingStatus(id, status, part: widget.part);
+      await _load();
+    } on ApiException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
+      }
+    }
+  }
+
+  Future<void> _edit(Object item) async {
+    final saved = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => item is Part
+            ? AddListingScreen(isPart: true, part: item)
+            : AddListingScreen(isPart: false, bike: item as Motorbike),
+      ),
+    );
+    if (saved == true) _load();
+  }
+
+  Future<void> _addNew() async {
+    final saved = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(
+            builder: (_) => AddListingScreen(isPart: widget.part)));
+    if (saved == true) _load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final total = _result?.total ?? 0;
+    final noun = widget.part ? 'parts' : 'bikes';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SectionTitle(
+          widget.part ? 'Mening qismlarim' : 'Mening mototsikllarim',
+          widget.part
+              ? "Qism va aksessuarlaringizni boshqaring, ma'lumotlarni yangilang."
+              : "E'lonlaringizni boshqaring, ma'lumotlarni yangilang va eskilarini arxivlang.",
+          label: 'GARAJ',
+          trailing: Row(children: [
+            Text('$total $noun',
+                style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: Brand.ink)),
+            const Spacer(),
+            SiteGradientButton(
+              label: widget.part ? "+ Qism qo'shish" : "+ E'lon qo'shish",
+              colors: const [_violet, _purple],
+              height: 38,
+              fontSize: 13.5,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              onTap: _addNew,
+            ),
+          ]),
+        ),
+        Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+            border: Border(bottom: BorderSide(color: Color(0xFFDDDDDD))),
+          ),
+          child: Row(children: [
+            for (final t in _tabs)
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      _status = t.$1;
+                      _page = 1;
+                      _result = null;
+                    });
+                    _load();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                            color: _status == t.$1
+                                ? Brand.ink
+                                : Colors.transparent,
+                            width: 2),
+                      ),
+                    ),
+                    child: Text(t.$2,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: _status == t.$1 ? Brand.ink : _muted)),
+                  ),
+                ),
+              ),
+          ]),
+        ),
+        const SizedBox(height: 16),
+        if (_error != null)
+          MessageView(icon: Icons.cloud_off, message: _error!, onRetry: _load)
+        else if (_result == null)
+          const SizedBox(height: 200, child: LoadingView())
+        else if (_result!.items.isEmpty)
+          _Empty(widget.part ? 'Qismlar topilmadi!' : 'Mototsikllar topilmadi!')
+        else ...[
+          for (final item in _result!.items) _listingCard(item),
+          _Pager(
+              page: _page,
+              total: total,
+              perPage: 5,
+              onPage: (p) {
+                setState(() => _page = p);
+                _load();
+              }),
+        ],
+      ],
+    );
+  }
+
+  Widget _listingCard(Object item) {
+    final bike = item is Motorbike ? item : null;
+    final part = item is Part ? item : null;
+    final id = bike?.id ?? part!.id;
+    final card = bike != null
+        ? ListingCard(
+            heroTag: 'mine-${bike.id}',
+            image: bike.images.isEmpty ? null : bike.images.first,
+            title: bike.title,
+            kicker: '${bike.brand} · ${bike.year}',
+            badge: bike.type,
+            rating: siteRating(bike.rank),
+            price: formatPrice(bike.price, bike.currency),
+            location: label(bike.location),
+            address: bike.address,
+            views: bike.views,
+            likes: bike.likes,
+            chips: [
+              CardChip(Icons.speed, '${bike.mileage} milya'),
+              CardChip(Icons.two_wheeler, label(bike.condition)),
+              CardChip(Icons.engineering, '${bike.engineCc} cc'),
+            ],
+            action: 'Ko\'rish',
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => MotorbikeDetailScreen(initial: bike))),
+          )
+        : ListingCard(
+            heroTag: 'mine-${part!.id}',
+            image: part.images.isEmpty ? null : part.images.first,
+            title: part.title,
+            kicker: '${label(part.brand)} · ${label(part.type)}',
+            badge: part.category,
+            rating: siteRating(part.rank),
+            price: formatPrice(part.price, part.currency),
+            location: label(part.location),
+            views: part.views,
+            likes: part.likes,
+            chips: [
+              CardChip(Icons.category, label(part.type)),
+              CardChip(Icons.build, label(part.condition)),
+              CardChip(Icons.inventory_2, '${part.stock} dona'),
+            ],
+            action: 'Ko\'rish',
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => PartDetailScreen(initial: part))),
+          );
+    Widget action(
+            String text, IconData icon, Color color, VoidCallback onTap) =>
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: onTap,
+            icon: Icon(icon, size: 17),
+            label: Text(text, overflow: TextOverflow.ellipsis),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: color,
+              side: BorderSide(color: color.withValues(alpha: 0.5)),
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              textStyle:
+                  const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+        );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 22),
+      child: Column(children: [
+        card,
+        const SizedBox(height: 10),
+        Row(children: [
+          if (_status != 'HOLD') ...[
+            action(
+                'Tahrirlash', Icons.edit_outlined, _violet, () => _edit(item)),
+            const SizedBox(width: 8),
+          ],
+          if (_status == 'ACTIVE') ...[
+            action('Arxivlash', Icons.archive_outlined, Brand.ink,
+                () => _setStatus(id, 'SOLD')),
+            const SizedBox(width: 8),
+          ],
+          if (_status == 'SOLD') ...[
+            action('Qayta joylash', Icons.unarchive_outlined, Brand.green,
+                () => _setStatus(id, 'ACTIVE')),
+            const SizedBox(width: 8),
+          ],
+          action("O'chirish", Icons.delete_outline, Colors.red,
+              () => _setStatus(id, 'DELETE')),
+        ]),
+      ]),
     );
   }
 }
