@@ -327,3 +327,43 @@ class Article {
     );
   }
 }
+
+/// A row of "Obunachilarim" / "Obunalarim": the other member and my relation.
+class FollowMember {
+  FollowMember({
+    required this.id,
+    required this.nick,
+    this.image,
+    this.followers = 0,
+    this.followings = 0,
+    this.likes = 0,
+    this.liked = false,
+    this.followed = false,
+  });
+
+  final String id;
+  final String nick;
+  final String? image;
+  final int followers;
+  final int followings;
+  final int likes;
+  final bool liked;
+  final bool followed;
+
+  /// [key] is followerData (followers list) or followingData (followings list).
+  factory FollowMember.fromJson(Map<String, dynamic> j, String key) {
+    final m = (j[key] as Map<String, dynamic>?) ?? const {};
+    return FollowMember(
+      id: '${m['_id'] ?? ''}',
+      nick: '${m['memberNick'] ?? ''}',
+      image: (m['memberImage'] as String?)?.isEmpty == true
+          ? null
+          : m['memberImage'] as String?,
+      followers: (m['memberFollowers'] as num?)?.toInt() ?? 0,
+      followings: (m['memberFollowings'] as num?)?.toInt() ?? 0,
+      likes: (m['memberLikes'] as num?)?.toInt() ?? 0,
+      liked: _flag(j['meLiked'], 'myFavorite'),
+      followed: _flag(j['meFollowed'], 'myFollowing'),
+    );
+  }
+}

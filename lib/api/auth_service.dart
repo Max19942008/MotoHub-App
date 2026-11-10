@@ -15,7 +15,8 @@ class Member {
       this.phone,
       this.image,
       this.type,
-      this.fullName});
+      this.fullName,
+      this.address});
 
   final String id;
   final String nick;
@@ -23,6 +24,7 @@ class Member {
   final String? image;
   final String? type;
   final String? fullName;
+  final String? address;
 
   bool get isAgent => type == 'AGENT';
 }
@@ -111,6 +113,34 @@ class AuthService extends ChangeNotifier {
             authenticated: false,
           )
           .catchError((_) => <String, dynamic>{}));
+    }
+  }
+
+  /// "My profile" form: nick / phone / address / photo. The server answers with
+  /// a fresh access token carrying the new data, which we keep.
+  Future<void> updateProfile({
+    String? nick,
+    String? phone,
+    String? address,
+    String? image,
+  }) async {
+    final id = _member?.id;
+    if (id == null) return;
+    final data = await _gql.query(
+      r'mutation ($input: MemberUpdate!) { updateMember(input: $input) { _id accessToken } }',
+      variables: {
+        'input': {
+          '_id': id,
+          if (nick != null) 'memberNick': nick,
+          if (phone != null) 'memberPhone': phone,
+          if (address != null) 'memberAddress': address,
+          if (image != null) 'memberImage': image,
+        },
+      },
+    );
+    final token = (data['updateMember'] as Map?)?['accessToken'] as String?;
+    if (token != null && token.isNotEmpty) {
+      await _saveTokens({'accessToken': token});
     }
   }
 
@@ -216,9 +246,15 @@ class AuthService extends ChangeNotifier {
       id: '${p['_id']}',
       nick: '${p['memberNick'] ?? ''}',
       phone: p['memberPhone'] as String?,
-      image: p['memberImage'] as String?,
+      // An account without a photo has memberImage "".
+      image: (p['memberImage'] as String?)?.nonEmpty,
       type: p['memberType'] as String?,
       fullName: p['memberFullName'] as String?,
+      address: p['memberAddress'] as String?,
     );
   }
+}
+
+extension on String {
+  String? get nonEmpty => isEmpty ? null : this;
 }

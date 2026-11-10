@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import '../config.dart';
 
@@ -83,6 +84,62 @@ class GraphQLClient {
       throw ApiException('Server bo\'sh javob qaytardi.');
     }
     return data;
+  }
+
+  /// Uploads one image with the GraphQL multipart spec (same as the site's
+  /// editor) and returns the stored path, e.g. "uploads/member/x.jpg".
+  /// [target] is the upload folder: member, property, part, article.
+  Future<String> uploadImage(String filePath, String target) async {
+    final token = await tokenProvider?.call();
+    final request = http.MultipartRequest('POST', Uri.parse(graphqlUrl))
+      ..headers.addAll({
+        'apollo-require-preflight': 'true',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      })
+      ..fields['operations'] = jsonEncode({
+        'query':
+            r'mutation ($file: Upload!, $target: String!) { imageUploader(file: $file, target: $target) }',
+        'variables': {'file': null, 'target': target},
+      })
+      ..fields['map'] = jsonEncode({
+        '0': ['variables.file']
+      })
+      ..files.add(await http.MultipartFile.fromPath('0', filePath,
+          contentType: _imageType(filePath)));
+    final http.Response response;
+    try {
+      response = await http.Response.fromStream(
+          await _http.send(request).timeout(const Duration(seconds: 90)));
+    } on TimeoutException {
+      throw ApiException('Rasm yuklanmadi: server javob bermadi.',
+          isNetwork: true);
+    } on SocketException {
+      throw ApiException('Internet aloqasi yo\'q.', isNetwork: true);
+    }
+    Map<String, dynamic> body;
+    try {
+      body =
+          jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+    } catch (_) {
+      throw ApiException('Rasm yuklanmadi (${response.statusCode}).');
+    }
+    final errors = body['errors'];
+    if (errors is List && errors.isNotEmpty) {
+      throw ApiException(
+          _translate('${(errors.first as Map)['message'] ?? 'Xato'}'));
+    }
+    final path = (body['data'] as Map?)?['imageUploader'];
+    if (path is! String || path.isEmpty) {
+      throw ApiException('Rasm yuklanmadi.');
+    }
+    return path;
+  }
+
+  static MediaType _imageType(String path) {
+    final p = path.toLowerCase();
+    // The backend accepts png / jpg / jpeg only; the picker re-encodes to jpeg.
+    if (p.endsWith('.png')) return MediaType('image', 'png');
+    return MediaType('image', 'jpeg');
   }
 
   /// Server messages are English; show the ones users hit most in Uzbek.

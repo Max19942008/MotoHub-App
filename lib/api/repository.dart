@@ -550,6 +550,88 @@ class Repository {
     return '${(data['createBoardArticle'] as Map)['_id']}';
   }
 
+  // ---- my page ----
+
+  /// "Sevimlilarim" ([visited] false) or "Yaqinda ko'rilganlar" (true).
+  Future<PageResult<Motorbike>> myBikes(int page,
+      {bool visited = false}) async {
+    final field = visited ? 'getVisited' : 'getFavorites';
+    final data = await _gql.query("""
+      query (\$input: OrdinaryInquiry!) {
+        $field(input: \$input) { list { $_motorbikeFields } metaCounter { total } }
+      }
+    """, variables: {
+      'input': {'page': page, 'limit': 6},
+    });
+    final result = data[field] as Map<String, dynamic>;
+    return PageResult(
+      (result['list'] as List)
+          .map((e) => Motorbike.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      _total(result),
+    );
+  }
+
+  /// [followers] true: who follows [memberId]; false: whom [memberId] follows.
+  Future<PageResult<FollowMember>> follows(String memberId, int page,
+      {required bool followers}) async {
+    final field = followers ? 'getMemberFollowers' : 'getMemberFollowings';
+    final key = followers ? 'followerData' : 'followingData';
+    final data = await _gql.query("""
+      query (\$input: FollowInquiry!) {
+        $field(input: \$input) {
+          list {
+            meLiked { myFavorite } meFollowed { myFollowing }
+            $key { _id memberNick memberImage memberFollowers memberFollowings memberLikes }
+          }
+          metaCounter { total }
+        }
+      }
+    """, variables: {
+      'input': {
+        'page': page,
+        'limit': 5,
+        'search': {
+          followers ? 'followingId' : 'followerId': memberId,
+        },
+      },
+    });
+    final result = data[field] as Map<String, dynamic>;
+    return PageResult(
+      (result['list'] as List)
+          .map((e) => FollowMember.fromJson(e as Map<String, dynamic>, key))
+          .toList(),
+      _total(result),
+    );
+  }
+
+  /// "Maqolalar" in my page: my own posts, newest first.
+  Future<PageResult<Article>> memberArticles(String memberId, int page) async {
+    final data = await _gql.query("""
+      query (\$input: BoardArticlesInquiry!) {
+        getBoardArticles(input: \$input) { list { $_articleFields } metaCounter { total } }
+      }
+    """, variables: {
+      'input': {
+        'page': page,
+        'limit': 6,
+        'sort': 'createdAt',
+        'direction': 'DESC',
+        'search': {'memberId': memberId},
+      },
+    });
+    final result = data['getBoardArticles'] as Map<String, dynamic>;
+    return PageResult(
+      (result['list'] as List)
+          .map((e) => Article.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      _total(result),
+    );
+  }
+
+  Future<String> uploadImage(String filePath, String target) =>
+      _gql.uploadImage(filePath, target);
+
   int _total(Map<String, dynamic> result) {
     final counter = result['metaCounter'];
     if (counter is List && counter.isNotEmpty) {

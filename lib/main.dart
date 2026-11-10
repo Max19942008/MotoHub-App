@@ -5,6 +5,7 @@ import 'api/auth_service.dart';
 import 'config.dart';
 import 'screens/agents_screen.dart';
 import 'screens/community_screen.dart';
+import 'screens/my_page_screen.dart' show DefaultAvatar;
 import 'screens/assistant_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/motorbikes_screen.dart';
@@ -175,7 +176,10 @@ class _AvatarButton extends StatelessWidget {
           border:
               Border.all(color: Colors.white.withValues(alpha: 0.3), width: 2),
         ),
-        child: ClipOval(child: NetImage(image, iconSize: 18)),
+        child: ClipOval(
+            child: image == null
+                ? const DefaultAvatar()
+                : NetImage(image, iconSize: 18)),
       ),
     );
   }

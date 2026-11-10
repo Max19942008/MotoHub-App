@@ -704,12 +704,17 @@ class SiteGradientButton extends StatelessWidget {
                     offset: const Offset(0, 5)),
               ],
             ),
-            child: Center(
-              child: Text(label,
-                  style: TextStyle(
-                      fontSize: fontSize,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white)),
+            // Hugs the label when the parent lets it, fills when stretched.
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(label,
+                    style: TextStyle(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white)),
+              ],
             ),
           ),
         ),
