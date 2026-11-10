@@ -80,4 +80,36 @@ class AssistantApi {
       ((result['sources'] as List?) ?? const []).map((e) => AiSource.fromJson(e as Map<String, dynamic>)).toList(),
     );
   }
+
+  /// Google Play AI policy: users can flag offensive or wrong answers.
+  Future<void> report({
+    required AiReportReason reason,
+    required String question,
+    required String answer,
+    String? comment,
+  }) async {
+    await GraphQLClient.instance.query(r'''
+      mutation ($input: AiReportInput!) { reportAssistantAnswer(input: $input) }
+    ''', variables: {
+      'input': {
+        'reason': reason.code,
+        'question': question.length > 1000 ? question.substring(0, 1000) : question,
+        'answer': answer.length > 8000 ? answer.substring(0, 8000) : answer,
+        if (comment != null && comment.trim().isNotEmpty) 'comment': comment.trim(),
+        'platform': 'android',
+      },
+    });
+  }
+}
+
+/// Why a user reports an AI answer (backend enum).
+enum AiReportReason {
+  offensive('OFFENSIVE', 'Haqoratli yoki nomaqbul'),
+  wrong('WRONG', 'Noto\'g\'ri ma\'lumot'),
+  spam('SPAM', 'Spam yoki reklama'),
+  other('OTHER', 'Boshqa sabab');
+
+  const AiReportReason(this.code, this.label);
+  final String code;
+  final String label;
 }

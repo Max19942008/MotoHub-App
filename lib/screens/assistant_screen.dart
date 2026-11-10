@@ -26,6 +26,7 @@ class _AssistantScreenState extends State<AssistantScreen> with AutomaticKeepAli
   final _input = TextEditingController();
   final _scroll = ScrollController();
   bool _sending = false;
+  final _reported = <int>{};
 
   @override
   bool get wantKeepAlive => true;
@@ -73,6 +74,23 @@ class _AssistantScreenState extends State<AssistantScreen> with AutomaticKeepAli
     });
   }
 
+  Future<void> _report(int index) async {
+    final answer = _turns[index];
+    final question = _turns.take(index).lastWhere((t) => t.isUser, orElse: () => ChatTurn.user('-')).text;
+    final sent = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => _ReportSheet(question: question, answer: answer.text),
+    );
+    if (sent == true && mounted) {
+      setState(() => _reported.add(index));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Rahmat! Shikoyatingiz qabul qilindi, uni ko\'rib chiqamiz.')),
+      );
+    }
+  }
+
   Future<void> _openSource(AiSource s) async {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
@@ -107,7 +125,12 @@ class _AssistantScreenState extends State<AssistantScreen> with AutomaticKeepAli
                   itemCount: _turns.length + (_sending ? 1 : 0),
                   itemBuilder: (context, i) {
                     if (i == _turns.length) return const _TypingBubble();
-                    return _TurnView(turn: _turns[i], onSource: _openSource);
+                    return _TurnView(
+                      turn: _turns[i],
+                      onSource: _openSource,
+                      reported: _reported.contains(i),
+                      onReport: () => _report(i),
+                    );
                   },
                 ),
         ),
@@ -170,7 +193,8 @@ class _EmptyState extends StatelessWidget {
         Text('MotoHub AI yordamchi', textAlign: TextAlign.center, style: theme.textTheme.titleLarge),
         const SizedBox(height: 8),
         Text(
-          'O\'zbek, rus yoki ingliz tilida yozing — men MotoHub e\'lonlaridan mos mototsikl va qismlarni topib beraman.',
+          'O\'zbek, rus yoki ingliz tilida yozing — men MotoHub e\'lonlaridan mos mototsikl va qismlarni topib beraman. '
+          'Javoblar sun\'iy intellekt tomonidan yaratiladi va xato bo\'lishi mumkin.',
           textAlign: TextAlign.center,
           style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
@@ -193,9 +217,11 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _TurnView extends StatelessWidget {
-  const _TurnView({required this.turn, required this.onSource});
+  const _TurnView({required this.turn, required this.onSource, required this.reported, required this.onReport});
   final ChatTurn turn;
   final ValueChanged<AiSource> onSource;
+  final bool reported;
+  final VoidCallback onReport;
 
   @override
   Widget build(BuildContext context) {
@@ -238,9 +264,146 @@ class _TurnView extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 6),
                   child: _SourceCard(index: n + 1, source: turn.sources[n], onTap: () => onSource(turn.sources[n])),
                 ),
+              if (!turn.isUser && !turn.isError) _AnswerFooter(reported: reported, onReport: onReport),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// "AI javobi" note + report button under every assistant answer.
+class _AnswerFooter extends StatelessWidget {
+  const _AnswerFooter({required this.reported, required this.onReport});
+  final bool reported;
+  final VoidCallback onReport;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final muted = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant);
+    return Padding(
+      padding: const EdgeInsets.only(top: 2),
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 4,
+        children: [
+          Text('AI javobi, xato bo\'lishi mumkin', style: muted),
+          reported
+              ? Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text('· Shikoyat yuborildi', style: muted),
+                )
+              : TextButton.icon(
+                  onPressed: onReport,
+                  icon: const Icon(Icons.flag_outlined, size: 16),
+                  label: const Text('Shikoyat qilish'),
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    foregroundColor: theme.colorScheme.error,
+                    textStyle: theme.textTheme.bodySmall,
+                  ),
+                ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReportSheet extends StatefulWidget {
+  const _ReportSheet({required this.question, required this.answer});
+  final String question;
+  final String answer;
+
+  @override
+  State<_ReportSheet> createState() => _ReportSheetState();
+}
+
+class _ReportSheetState extends State<_ReportSheet> {
+  AiReportReason? _reason;
+  final _comment = TextEditingController();
+  bool _sending = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _comment.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final reason = _reason;
+    if (reason == null || _sending) return;
+    setState(() {
+      _sending = true;
+      _error = null;
+    });
+    try {
+      await AssistantApi.instance.report(
+        reason: reason,
+        question: widget.question,
+        answer: widget.answer,
+        comment: _comment.text,
+      );
+      if (mounted) Navigator.of(context).pop(true);
+      return;
+    } on ApiException catch (e) {
+      _error = e.message;
+    } catch (_) {
+      _error = 'Yuborib bo\'lmadi, qayta urinib ko\'ring.';
+    }
+    if (mounted) setState(() => _sending = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + MediaQuery.viewInsetsOf(context).bottom),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('AI javobi ustidan shikoyat', style: theme.textTheme.titleLarge),
+          const SizedBox(height: 4),
+          Text('Bu javobda nima noto\'g\'ri?', style: theme.textTheme.bodyMedium),
+          const SizedBox(height: 8),
+          RadioGroup<AiReportReason>(
+            groupValue: _reason,
+            onChanged: (v) => setState(() => _reason = v),
+            child: Column(
+              children: [
+                for (final r in AiReportReason.values)
+                  RadioListTile<AiReportReason>(
+                    value: r,
+                    title: Text(r.label),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _comment,
+            maxLength: 500,
+            maxLines: 3,
+            minLines: 1,
+            decoration: const InputDecoration(labelText: 'Izoh (ixtiyoriy)', border: OutlineInputBorder()),
+          ),
+          if (_error != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(_error!, style: TextStyle(color: theme.colorScheme.error)),
+            ),
+          FilledButton(
+            onPressed: _reason == null || _sending ? null : _submit,
+            child: _sending
+                ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Text('Yuborish'),
+          ),
+        ],
       ),
     );
   }
