@@ -33,7 +33,8 @@ class _MotorbikeDetailScreenState extends State<MotorbikeDetailScreen> {
 
   Future<List<Widget>> _loadSimilar() async {
     try {
-      final list = await Repository.instance.similarMotorbikes(widget.initial.location);
+      final list =
+          await Repository.instance.similarMotorbikes(widget.initial.location);
       return [
         for (final b in list.where((b) => b.id != widget.initial.id))
           SimilarCard(
@@ -51,7 +52,9 @@ class _MotorbikeDetailScreenState extends State<MotorbikeDetailScreen> {
             rent: b.rent,
             barter: b.barter,
             onTap: () => Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (_) => MotorbikeDetailScreen(initial: b))),
+                context,
+                MaterialPageRoute(
+                    builder: (_) => MotorbikeDetailScreen(initial: b))),
           ),
       ];
     } catch (_) {
@@ -62,7 +65,8 @@ class _MotorbikeDetailScreenState extends State<MotorbikeDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final b = _bike;
-    final options = b.barter ? 'Ayirboshlash' : 'Ijara mavjud'; // same wording as the site
+    final options =
+        b.barter ? 'Ayirboshlash' : 'Ijara mavjud'; // same wording as the site
     return SiteDetailPage(
       id: b.id,
       crumb: 'Mototsikl',

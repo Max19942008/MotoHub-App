@@ -7,7 +7,8 @@ import '../config.dart';
 /// Network image with a neutral placeholder when the URL is empty or broken
 /// (old uploads on the free Render instance are gone, so this is common).
 class NetImage extends StatelessWidget {
-  const NetImage(this.path, {super.key, this.fit = BoxFit.cover, this.iconSize = 40});
+  const NetImage(this.path,
+      {super.key, this.fit = BoxFit.cover, this.iconSize = 40});
 
   final String? path;
   final BoxFit fit;
@@ -32,7 +33,8 @@ class NetImage extends StatelessWidget {
       url,
       fit: fit,
       errorBuilder: (_, __, ___) => placeholder,
-      loadingBuilder: (context, child, progress) => progress == null ? child : placeholder,
+      loadingBuilder: (context, child, progress) =>
+          progress == null ? child : placeholder,
     );
   }
 }
@@ -88,7 +90,8 @@ class _LoadingViewState extends State<LoadingView> {
 }
 
 class MessageView extends StatelessWidget {
-  const MessageView({super.key, required this.icon, required this.message, this.onRetry});
+  const MessageView(
+      {super.key, required this.icon, required this.message, this.onRetry});
 
   final IconData icon;
   final String message;
@@ -108,7 +111,8 @@ class MessageView extends StatelessWidget {
             Text(message, textAlign: TextAlign.center),
             if (onRetry != null) ...[
               const SizedBox(height: 16),
-              FilledButton.tonal(onPressed: onRetry, child: const Text('Qayta urinish')),
+              FilledButton.tonal(
+                  onPressed: onRetry, child: const Text('Qayta urinish')),
             ],
           ],
         ),
@@ -130,7 +134,9 @@ class Tag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: highlight ? scheme.primary : scheme.surfaceContainerHighest.withValues(alpha: 0.95),
+        color: highlight
+            ? scheme.primary
+            : scheme.surfaceContainerHighest.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(

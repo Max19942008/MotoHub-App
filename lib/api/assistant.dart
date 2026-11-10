@@ -77,7 +77,9 @@ class AssistantApi {
     final result = data['askAssistant'] as Map<String, dynamic>;
     return ChatTurn.assistant(
       '${result['answer'] ?? ''}',
-      ((result['sources'] as List?) ?? const []).map((e) => AiSource.fromJson(e as Map<String, dynamic>)).toList(),
+      ((result['sources'] as List?) ?? const [])
+          .map((e) => AiSource.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -93,9 +95,11 @@ class AssistantApi {
     ''', variables: {
       'input': {
         'reason': reason.code,
-        'question': question.length > 1000 ? question.substring(0, 1000) : question,
+        'question':
+            question.length > 1000 ? question.substring(0, 1000) : question,
         'answer': answer.length > 8000 ? answer.substring(0, 8000) : answer,
-        if (comment != null && comment.trim().isNotEmpty) 'comment': comment.trim(),
+        if (comment != null && comment.trim().isNotEmpty)
+          'comment': comment.trim(),
         'platform': 'android',
       },
     });

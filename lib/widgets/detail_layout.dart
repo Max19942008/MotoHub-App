@@ -5,6 +5,7 @@ import '../api/auth_service.dart';
 import '../api/graphql_client.dart';
 import '../api/repository.dart';
 import '../models/listing.dart';
+import '../screens/agent_detail_screen.dart';
 import '../theme.dart';
 import '../utils/labels.dart';
 import 'common.dart';
@@ -108,7 +109,8 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
   bool _sending = false;
   bool _interestSent = false;
 
-  void _toast(String text) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  void _toast(String text) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
 
   bool _requireLogin() {
     if (AuthService.instance.isLoggedIn) return true;
@@ -146,7 +148,8 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
   Future<void> _call() async {
     final phone = widget.seller?.phone;
     if (phone == null || phone.isEmpty) return;
-    final uri = Uri(scheme: 'tel', path: phone.replaceAll(RegExp(r'[^\d+]'), ''));
+    final uri =
+        Uri(scheme: 'tel', path: phone.replaceAll(RegExp(r'[^\d+]'), ''));
     if (!await launchUrl(uri) && mounted) _toast('Telefon: $phone');
   }
 
@@ -157,7 +160,10 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(toolbarHeight: 60, automaticallyImplyLeading: false, title: const BrandLogo(height: 36)),
+      appBar: AppBar(
+          toolbarHeight: 60,
+          automaticallyImplyLeading: false,
+          title: const BrandLogo(height: 36)),
       body: RefreshIndicator(
         onRefresh: widget.onRefresh,
         child: ListView(
@@ -169,11 +175,20 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
               spacing: 8,
               runSpacing: 4,
               children: [
-                const Text('Bosh sahifa', style: TextStyle(fontSize: 13, color: Color(0xFF6B7280))),
-                const Text('/', style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF))),
-                Text(widget.crumb, style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280))),
-                const Text('/', style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF))),
-                Text(widget.title, style: const TextStyle(fontSize: 13, color: Brand.ink, fontWeight: FontWeight.w500)),
+                const Text('Bosh sahifa',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF6B7280))),
+                const Text('/',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF))),
+                Text(widget.crumb,
+                    style: const TextStyle(
+                        fontSize: 13, color: Color(0xFF6B7280))),
+                const Text('/',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF))),
+                Text(widget.title,
+                    style: const TextStyle(
+                        fontSize: 13,
+                        color: Brand.ink,
+                        fontWeight: FontWeight.w500)),
               ],
             ),
             const SizedBox(height: 12),
@@ -184,8 +199,12 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                   backgroundColor: const Color(0xFF4CAF50),
                   minimumSize: const Size(0, 38),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  textStyle: const TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w500),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  textStyle: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500),
                 ),
                 onPressed: () => Navigator.of(context).maybePop(),
                 icon: const Icon(Icons.arrow_back, size: 18),
@@ -211,20 +230,33 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _whitePill(Text(widget.typeBadge.toUpperCase(),
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Brand.ink))),
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Brand.ink))),
                           const SizedBox(width: 8),
-                          _whitePill(Column(mainAxisSize: MainAxisSize.min, children: [
-                            const Icon(Icons.location_on, size: 16, color: Brand.ink),
-                            Text(widget.location, style: const TextStyle(fontSize: 13, color: Brand.ink)),
+                          _whitePill(
+                              Column(mainAxisSize: MainAxisSize.min, children: [
+                            const Icon(Icons.location_on,
+                                size: 16, color: Brand.ink),
+                            Text(widget.location,
+                                style: const TextStyle(
+                                    fontSize: 13, color: Brand.ink)),
                           ])),
                           const Spacer(),
-                          _darkPill(Icons.visibility_outlined, '${widget.views}'),
+                          _darkPill(
+                              Icons.visibility_outlined, '${widget.views}'),
                           const SizedBox(width: 8),
                           GestureDetector(
                             onTap: _like,
                             child: _darkPill(
-                                widget.liked ? Icons.favorite : Icons.favorite_border, '${widget.likes}',
-                                iconColor: widget.liked ? const Color(0xFFE91E63) : Colors.white),
+                                widget.liked
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                '${widget.likes}',
+                                iconColor: widget.liked
+                                    ? const Color(0xFFE91E63)
+                                    : Colors.white),
                           ),
                         ],
                       ),
@@ -233,7 +265,8 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                       left: 20,
                       bottom: 20,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 18, vertical: 12),
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(12),
@@ -242,11 +275,19 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text('NARX',
-                                style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600)),
                             Text(widget.price,
-                                style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w800)),
                             if (widget.overlayPeriod.isNotEmpty)
-                              Text(widget.overlayPeriod, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                              Text(widget.overlayPeriod,
+                                  style: const TextStyle(
+                                      color: Colors.white70, fontSize: 12)),
                           ],
                         ),
                       ),
@@ -269,12 +310,21 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                       width: 84,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: i == _image ? Brand.ink : Colors.transparent, width: 2),
+                        border: Border.all(
+                            color: i == _image ? Brand.ink : Colors.transparent,
+                            width: 2),
                         boxShadow: i == _image
-                            ? [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 8, offset: const Offset(0, 2))]
+                            ? [
+                                BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.15),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2))
+                              ]
                             : null,
                       ),
-                      child: ClipRRect(borderRadius: BorderRadius.circular(10), child: NetImage(images[i], iconSize: 18)),
+                      child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: NetImage(images[i], iconSize: 18)),
                     ),
                   ),
                 ),
@@ -286,7 +336,8 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [Color(0xFFF8F9FA), Colors.white]),
+                gradient: const LinearGradient(
+                    colors: [Color(0xFFF8F9FA), Colors.white]),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFE0E0E0)),
               ),
@@ -294,10 +345,20 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('NARX',
-                      style: TextStyle(fontSize: 13, color: Color(0xFF717171), fontWeight: FontWeight.w500, letterSpacing: 0.5)),
+                      style: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF717171),
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.5)),
                   const SizedBox(height: 4),
-                  Text(widget.price, style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Brand.ink)),
-                  Text(widget.pricePeriod, style: const TextStyle(fontSize: 14, color: Color(0xFF717171))),
+                  Text(widget.price,
+                      style: const TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.w800,
+                          color: Brand.ink)),
+                  Text(widget.pricePeriod,
+                      style: const TextStyle(
+                          fontSize: 14, color: Color(0xFF717171))),
                 ],
               ),
             ),
@@ -311,7 +372,9 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
             const SizedBox(height: 12),
             _actionButton(
               icon: interested ? Icons.check_circle : Icons.handshake,
-              label: interested ? 'Sotuvchi xabardor qilindi' : (_sending ? 'Yuborilmoqda…' : 'Qiziqaman'),
+              label: interested
+                  ? 'Sotuvchi xabardor qilindi'
+                  : (_sending ? 'Yuborilmoqda…' : 'Qiziqaman'),
               onTap: _interest,
               done: interested,
             ),
@@ -328,8 +391,13 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
             // Options box
             _rainbowBox(
-              top: const LinearGradient(
-                  colors: [Color(0xFFFF6B6B), Color(0xFF3B82F6), Color(0xFFEAB308), Color(0xFF4CAF50), Color(0xFFA855F7)]),
+              top: const LinearGradient(colors: [
+                Color(0xFFFF6B6B),
+                Color(0xFF3B82F6),
+                Color(0xFFEAB308),
+                Color(0xFF4CAF50),
+                Color(0xFFA855F7)
+              ]),
               child: Column(
                 children: [for (final s in widget.specs) _specTile(s)],
               ),
@@ -338,7 +406,8 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
             // Description + details
             _rainbowBox(
-              top: const LinearGradient(colors: [Color(0xFF4CAF50), Color(0xFF43A047)]),
+              top: const LinearGradient(
+                  colors: [Color(0xFF4CAF50), Color(0xFF43A047)]),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -347,18 +416,30 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Color(0xFFF8F9FA), Colors.white]),
+                      gradient: const LinearGradient(
+                          colors: [Color(0xFFF8F9FA), Colors.white]),
                       borderRadius: BorderRadius.circular(12),
-                      border: const Border(left: BorderSide(color: Color(0xFF4CAF50), width: 4)),
+                      border: const Border(
+                          left: BorderSide(color: Color(0xFF4CAF50), width: 4)),
                     ),
-                    child: Text(plainText(widget.description).isEmpty ? 'No Description!' : plainText(widget.description),
-                        style: const TextStyle(fontSize: 15, color: Color(0xFF4B5563), height: 1.6)),
+                    child: Text(
+                        plainText(widget.description).isEmpty
+                            ? 'No Description!'
+                            : plainText(widget.description),
+                        style: const TextStyle(
+                            fontSize: 15,
+                            color: Color(0xFF4B5563),
+                            height: 1.6)),
                   ),
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 28),
                     height: 2,
                     decoration: const BoxDecoration(
-                        gradient: LinearGradient(colors: [Color(0xFF4CAF50), Color(0xFFE0E0E0), Colors.transparent])),
+                        gradient: LinearGradient(colors: [
+                      Color(0xFF4CAF50),
+                      Color(0xFFE0E0E0),
+                      Colors.transparent
+                    ])),
                   ),
                   _sectionTitle(widget.detailsTitle),
                   for (final d in widget.details) _detailRow(d),
@@ -368,43 +449,62 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
             if (widget.commentGroup != null) ...[
               const SizedBox(height: 28),
-              _Reviews(group: widget.commentGroup!, refId: widget.id),
+              SiteReviews(group: widget.commentGroup!, refId: widget.id),
             ],
             const SizedBox(height: 28),
 
             // Related
             _rainbowBox(
-              top: const LinearGradient(colors: [Color(0xFFEAB308), Color(0xFF4CAF50), Color(0xFFA855F7)]),
+              top: const LinearGradient(colors: [
+                Color(0xFFEAB308),
+                Color(0xFF4CAF50),
+                Color(0xFFA855F7)
+              ]),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ShaderMask(
-                    shaderCallback: (r) => const LinearGradient(
-                        colors: [Color(0xFF1B3A26), Color(0xFF4CAF50), Color(0xFF3B82F6)]).createShader(r),
+                    shaderCallback: (r) => const LinearGradient(colors: [
+                      Color(0xFF1B3A26),
+                      Color(0xFF4CAF50),
+                      Color(0xFF3B82F6)
+                    ]).createShader(r),
                     child: Text(widget.similarTitle,
-                        style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: Colors.white, height: 1.3)),
+                        style: const TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            height: 1.3)),
                   ),
                   Container(
                     margin: const EdgeInsets.only(top: 8, bottom: 12),
                     width: 80,
                     height: 4,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Color(0xFF4CAF50), Color(0xFF3B82F6)]),
+                      gradient: const LinearGradient(
+                          colors: [Color(0xFF4CAF50), Color(0xFF3B82F6)]),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  Text(widget.similarSubtitle, style: const TextStyle(fontSize: 15, color: Color(0xFF6B7280), height: 1.6)),
+                  Text(widget.similarSubtitle,
+                      style: const TextStyle(
+                          fontSize: 15, color: Color(0xFF6B7280), height: 1.6)),
                   const SizedBox(height: 32),
                   FutureBuilder<List<Widget>>(
                     future: widget.similar,
                     builder: (context, snap) {
                       if (snap.connectionState != ConnectionState.done) {
-                        return const Padding(padding: EdgeInsets.all(24), child: Center(child: CircularProgressIndicator()));
+                        return const Padding(
+                            padding: EdgeInsets.all(24),
+                            child: Center(child: CircularProgressIndicator()));
                       }
                       final cards = snap.data ?? const [];
                       return Column(
                         children: [
-                          for (final c in cards) Padding(padding: const EdgeInsets.only(bottom: 18), child: c),
+                          for (final c in cards)
+                            Padding(
+                                padding: const EdgeInsets.only(bottom: 18),
+                                child: c),
                         ],
                       );
                     },
@@ -420,17 +520,27 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
   Widget _whitePill(Widget child) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.95), borderRadius: BorderRadius.circular(20)),
+        decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.95),
+            borderRadius: BorderRadius.circular(20)),
         child: child,
       );
 
-  Widget _darkPill(IconData icon, String text, {Color iconColor = Colors.white}) => Container(
+  Widget _darkPill(IconData icon, String text,
+          {Color iconColor = Colors.white}) =>
+      Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(20)),
+        decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(20)),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Icon(icon, size: 16, color: iconColor),
           const SizedBox(width: 6),
-          Text(text, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+          Text(text,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600)),
         ]),
       );
 
@@ -444,11 +554,17 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
   }) {
     const green = Color(0xFF4CAF50);
     final style = TextStyle(
-        fontFamily: 'Poppins', fontSize: 15.5, fontWeight: FontWeight.w700, color: filled || done ? Colors.white : green);
+        fontFamily: 'Poppins',
+        fontSize: 15.5,
+        fontWeight: FontWeight.w700,
+        color: filled || done ? Colors.white : green);
     final child = Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Icon(icon, size: 21, color: iconColor ?? (filled || done ? Colors.white : green)),
+      Icon(icon,
+          size: 21,
+          color: iconColor ?? (filled || done ? Colors.white : green)),
       const SizedBox(width: 10),
-      Flexible(child: Text(label, style: style, overflow: TextOverflow.ellipsis)),
+      Flexible(
+          child: Text(label, style: style, overflow: TextOverflow.ellipsis)),
     ]);
     return SizedBox(
       height: filled ? 54 : 50,
@@ -458,9 +574,14 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
         shadowColor: green.withValues(alpha: 0.4),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: filled ? BorderSide.none : const BorderSide(color: green, width: 2),
+          side: filled
+              ? BorderSide.none
+              : const BorderSide(color: green, width: 2),
         ),
-        child: InkWell(borderRadius: BorderRadius.circular(12), onTap: onTap, child: child),
+        child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: onTap,
+            child: child),
       ),
     );
   }
@@ -474,12 +595,18 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
         ),
         child: Column(
           children: [
-            ClipOval(child: SizedBox.square(dimension: 80, child: NetImage(s.image, iconSize: 30))),
+            ClipOval(
+                child: SizedBox.square(
+                    dimension: 80, child: NetImage(s.image, iconSize: 30))),
             const SizedBox(height: 14),
             Text(s.nick.isEmpty ? 'Dealer' : s.nick,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Brand.ink)),
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Brand.ink)),
             const SizedBox(height: 4),
-            Text(widget.location, style: const TextStyle(fontSize: 14, color: Color(0xFF717171))),
+            Text(widget.location,
+                style: const TextStyle(fontSize: 14, color: Color(0xFF717171))),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
@@ -487,7 +614,8 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFF4CAF50),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: _call,
                 icon: const Icon(Icons.phone, size: 19),
@@ -502,10 +630,15 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF4CAF50),
                   side: const BorderSide(color: Color(0xFF4CAF50), width: 2),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  textStyle: const TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  textStyle: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600),
                 ),
-                onPressed: () => _toast('Tez orada: sotuvchi sahifasi'),
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => AgentDetailScreen(agentId: s.id))),
                 child: const Text('View Dealer'),
               ),
             ),
@@ -513,19 +646,30 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
         ),
       );
 
-  Widget _rainbowBox({required Gradient top, required Widget child}) => Container(
+  Widget _rainbowBox({required Gradient top, required Widget child}) =>
+      Container(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.white, Color(0xFFF8F9FF)]),
+          gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.white, Color(0xFFF8F9FF)]),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: const Color(0xFFF0F0F0)),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 30, offset: const Offset(0, 8))],
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 30,
+                offset: const Offset(0, 8))
+          ],
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(height: 4, decoration: BoxDecoration(gradient: top)),
-            Padding(padding: const EdgeInsets.fromLTRB(26, 32, 26, 32), child: child),
+            Padding(
+                padding: const EdgeInsets.fromLTRB(26, 32, 26, 32),
+                child: child),
           ],
         ),
       );
@@ -546,7 +690,12 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: s.colors),
                 borderRadius: BorderRadius.circular(18),
-                boxShadow: [BoxShadow(color: s.colors.first.withValues(alpha: 0.35), blurRadius: 14, offset: const Offset(0, 6))],
+                boxShadow: [
+                  BoxShadow(
+                      color: s.colors.first.withValues(alpha: 0.35),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6))
+                ],
               ),
               child: Icon(s.icon, color: Colors.white, size: 30),
             ),
@@ -556,10 +705,17 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(s.label.toUpperCase(),
-                      style: const TextStyle(fontSize: 12.5, color: Color(0xFF6B7280), fontWeight: FontWeight.w600, letterSpacing: 1)),
+                      style: const TextStyle(
+                          fontSize: 12.5,
+                          color: Color(0xFF6B7280),
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1)),
                   const SizedBox(height: 8),
                   Text(s.value,
-                      style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Color(0xFF1B3A26))),
+                      style: const TextStyle(
+                          fontSize: 21,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF1B3A26))),
                 ],
               ),
             ),
@@ -573,14 +729,22 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ShaderMask(
-              shaderCallback: (r) => const LinearGradient(colors: [Color(0xFF1B3A26), Color(0xFF4CAF50)]).createShader(r),
-              child: Text(t, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white)),
+              shaderCallback: (r) => const LinearGradient(
+                      colors: [Color(0xFF1B3A26), Color(0xFF4CAF50)])
+                  .createShader(r),
+              child: Text(t,
+                  style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white)),
             ),
             Container(
               margin: const EdgeInsets.only(top: 8),
               width: 50,
               height: 3,
-              decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF4CAF50), Colors.transparent])),
+              decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [Color(0xFF4CAF50), Colors.transparent])),
             ),
           ],
         ),
@@ -600,22 +764,33 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(d.label.toUpperCase(),
-                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF2E7D32), letterSpacing: 1.2)),
+                    style: const TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF2E7D32),
+                        letterSpacing: 1.2)),
                 Container(
                   margin: const EdgeInsets.only(top: 6),
                   width: 50,
                   height: 3,
-                  decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF4CAF50), Colors.transparent])),
+                  decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                          colors: [Color(0xFF4CAF50), Colors.transparent])),
                 ),
               ],
             ),
             const SizedBox(width: 12),
             Expanded(
               child: ShaderMask(
-                shaderCallback: (r) => const LinearGradient(colors: [Color(0xFF1B3A26), Color(0xFF2E7D32)]).createShader(r),
+                shaderCallback: (r) => const LinearGradient(
+                        colors: [Color(0xFF1B3A26), Color(0xFF2E7D32)])
+                    .createShader(r),
                 child: Text(d.value,
                     textAlign: TextAlign.right,
-                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Colors.white)),
+                    style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white)),
               ),
             ),
           ],
@@ -624,18 +799,19 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 }
 
 /// "Izohlar" list + "Fikringizni qoldiring" box.
-class _Reviews extends StatefulWidget {
-  const _Reviews({required this.group, required this.refId});
+class SiteReviews extends StatefulWidget {
+  const SiteReviews({super.key, required this.group, required this.refId});
   final String group;
   final String refId;
 
   @override
-  State<_Reviews> createState() => _ReviewsState();
+  State<SiteReviews> createState() => _ReviewsState();
 }
 
-class _ReviewsState extends State<_Reviews> {
+class _ReviewsState extends State<SiteReviews> {
   final _text = TextEditingController();
-  late Future<PageResult<Comment>> _comments = Repository.instance.comments(widget.refId, 1);
+  late Future<PageResult<Comment>> _comments =
+      Repository.instance.comments(widget.refId, 1);
   bool _sending = false;
 
   @override
@@ -648,7 +824,8 @@ class _ReviewsState extends State<_Reviews> {
     final content = _text.text.trim();
     if (content.isEmpty || _sending) return;
     if (!AuthService.instance.isLoggedIn) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Avval tizimga kiring')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Avval tizimga kiring')));
       return;
     }
     setState(() => _sending = true);
@@ -657,7 +834,10 @@ class _ReviewsState extends State<_Reviews> {
       _text.clear();
       setState(() => _comments = Repository.instance.comments(widget.refId, 1));
     } on ApiException catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
+      }
     } finally {
       if (mounted) setState(() => _sending = false);
     }
@@ -687,27 +867,46 @@ class _ReviewsState extends State<_Reviews> {
                     const Icon(Icons.star_rounded, color: Color(0xFFFFC107)),
                     const SizedBox(width: 8),
                     Text('${snap.data!.total} Izohlar',
-                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Brand.ink)),
+                        style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: Brand.ink)),
                   ]),
                   const SizedBox(height: 16),
                   for (final c in list)
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: const BoxDecoration(border: Border(top: BorderSide(color: Color(0xFFF0F0F0)))),
+                      decoration: const BoxDecoration(
+                          border: Border(
+                              top: BorderSide(color: Color(0xFFF0F0F0)))),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(children: [
-                            ClipOval(child: SizedBox.square(dimension: 40, child: NetImage(c.authorImage, iconSize: 18))),
+                            ClipOval(
+                                child: SizedBox.square(
+                                    dimension: 40,
+                                    child:
+                                        NetImage(c.authorImage, iconSize: 18))),
                             const SizedBox(width: 12),
-                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text(c.author, style: const TextStyle(fontWeight: FontWeight.w600, color: Brand.ink)),
-                              if (c.createdAt != null)
-                                Text(_date(c.createdAt!), style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
-                            ]),
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(c.author,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Brand.ink)),
+                                  if (c.createdAt != null)
+                                    Text(_date(c.createdAt!),
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Color(0xFF9CA3AF))),
+                                ]),
                           ]),
                           const SizedBox(height: 10),
-                          Text(c.content, style: const TextStyle(color: Color(0xFF4B5563), height: 1.5)),
+                          Text(c.content,
+                              style: const TextStyle(
+                                  color: Color(0xFF4B5563), height: 1.5)),
                         ],
                       ),
                     ),
@@ -718,7 +917,8 @@ class _ReviewsState extends State<_Reviews> {
         ),
         Container(
           decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [Colors.white, Color(0xFFF0F9FF)]),
+            gradient:
+                const LinearGradient(colors: [Colors.white, Color(0xFFF0F9FF)]),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: const Color(0xFFE0F2FE), width: 2),
           ),
@@ -728,7 +928,12 @@ class _ReviewsState extends State<_Reviews> {
             children: [
               Container(
                 height: 4,
-                decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6), Color(0xFF3B82F6)])),
+                decoration: const BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                  Color(0xFF3B82F6),
+                  Color(0xFF8B5CF6),
+                  Color(0xFF3B82F6)
+                ])),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(46, 40, 46, 40),
@@ -736,17 +941,29 @@ class _ReviewsState extends State<_Reviews> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ShaderMask(
-                      shaderCallback: (r) => const LinearGradient(colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)]).createShader(r),
+                      shaderCallback: (r) => const LinearGradient(
+                              colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)])
+                          .createShader(r),
                       child: const Text('Fikringizni qoldiring',
-                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white, height: 1.3)),
+                          style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              height: 1.3)),
                     ),
                     Container(
                       margin: const EdgeInsets.only(top: 8, bottom: 30),
                       width: 60,
                       height: 4,
-                      decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF3B82F6), Colors.transparent])),
+                      decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: [Color(0xFF3B82F6), Colors.transparent])),
                     ),
-                    const Text('👉  Tajriba', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Brand.ink)),
+                    const Text('👉  Tajriba',
+                        style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: Brand.ink)),
                     const SizedBox(height: 18),
                     TextField(
                       controller: _text,
@@ -757,32 +974,49 @@ class _ReviewsState extends State<_Reviews> {
                         fillColor: const Color(0xFFFAFAFA),
                         contentPadding: const EdgeInsets.all(16),
                         enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 2)),
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(
+                                color: Color(0xFFE0E0E0), width: 2)),
                         focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 2)),
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(
+                                color: Color(0xFF3B82F6), width: 2)),
                       ),
                     ),
                     const SizedBox(height: 30),
                     SizedBox(
                       height: 62,
                       child: Material(
-                        color: _text.text.trim().isEmpty ? const Color(0xFFE5E7EB) : const Color(0xFF3B82F6),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        color: _text.text.trim().isEmpty
+                            ? const Color(0xFFE5E7EB)
+                            : const Color(0xFF3B82F6),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
                         elevation: 0,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
                           onTap: _text.text.trim().isEmpty ? null : _submit,
-                          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                            Text(_sending ? 'YUBORILMOQDA…' : 'SHARH YUBORISH',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 1,
-                                    color: _text.text.trim().isEmpty ? const Color(0xFFBDBDBD) : Colors.white)),
-                            const SizedBox(width: 18),
-                            Icon(Icons.north_east,
-                                color: _text.text.trim().isEmpty ? Colors.white : Colors.white, size: 26),
-                          ]),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                    _sending
+                                        ? 'YUBORILMOQDA…'
+                                        : 'SHARH YUBORISH',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 1,
+                                        color: _text.text.trim().isEmpty
+                                            ? const Color(0xFFBDBDBD)
+                                            : Colors.white)),
+                                const SizedBox(width: 18),
+                                Icon(Icons.north_east,
+                                    color: _text.text.trim().isEmpty
+                                        ? Colors.white
+                                        : Colors.white,
+                                    size: 26),
+                              ]),
                         ),
                       ),
                     ),
@@ -797,7 +1031,20 @@ class _ReviewsState extends State<_Reviews> {
   }
 
   static String _date(DateTime d) {
-    const months = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'];
+    const months = [
+      'Yanvar',
+      'Fevral',
+      'Mart',
+      'Aprel',
+      'May',
+      'Iyun',
+      'Iyul',
+      'Avgust',
+      'Sentabr',
+      'Oktabr',
+      'Noyabr',
+      'Dekabr'
+    ];
     return '${d.day.toString().padLeft(2, '0')} ${months[d.month - 1]}, ${d.year}';
   }
 }
@@ -839,7 +1086,11 @@ class SimilarCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(t,
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: on ? const Color(0xFF2E7D32) : const Color(0xFFBDBDBD))),
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color:
+                      on ? const Color(0xFF2E7D32) : const Color(0xFFBDBDBD))),
         );
     return Center(
       child: ConstrainedBox(
@@ -863,12 +1114,18 @@ class SimilarCard extends StatelessWidget {
                       left: 20,
                       bottom: 20,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(colors: [Colors.white, Color(0xFFF2F2F2)]),
+                          gradient: const LinearGradient(
+                              colors: [Colors.white, Color(0xFFF2F2F2)]),
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: Text(price, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Brand.ink)),
+                        child: Text(price,
+                            style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: Brand.ink)),
                       ),
                     ),
                   ]),
@@ -881,12 +1138,18 @@ class SimilarCard extends StatelessWidget {
                       Text(title.toUpperCase(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Color(0xFF1B3A26))),
+                          style: const TextStyle(
+                              fontSize: 21,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF1B3A26))),
                       const SizedBox(height: 14),
                       Row(children: [
-                        const Icon(Icons.location_on, color: Color(0xFF4CAF50), size: 20),
+                        const Icon(Icons.location_on,
+                            color: Color(0xFF4CAF50), size: 20),
                         const SizedBox(width: 8),
-                        Text(location.toUpperCase(), style: const TextStyle(fontSize: 14, color: Color(0xFF717171))),
+                        Text(location.toUpperCase(),
+                            style: const TextStyle(
+                                fontSize: 14, color: Color(0xFF717171))),
                       ]),
                       const SizedBox(height: 30),
                       Row(children: [
@@ -894,39 +1157,51 @@ class SimilarCard extends StatelessWidget {
                           if (i > 0) const SizedBox(width: 10),
                           Expanded(
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 9),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFEFF6FF),
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: const Color(0xFFBFDBFE)),
+                                border:
+                                    Border.all(color: const Color(0xFFBFDBFE)),
                               ),
                               child: Row(children: [
-                                Icon(pills[i].$1, size: 15, color: const Color(0xFF3B82F6)),
+                                Icon(pills[i].$1,
+                                    size: 15, color: const Color(0xFF3B82F6)),
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(pills[i].$2,
                                       maxLines: 1,
                                       overflow: TextOverflow.clip,
-                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Brand.ink)),
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          color: Brand.ink)),
                                 ),
                               ]),
                             ),
                           ),
                         ],
                       ]),
-                      const Padding(padding: EdgeInsets.symmetric(vertical: 22), child: Divider(height: 1, color: Color(0xFFEEEEEE))),
+                      const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 22),
+                          child: Divider(height: 1, color: Color(0xFFEEEEEE))),
                       Row(children: [
                         tag('Rent', rent),
                         const SizedBox(width: 8),
                         tag('Barter', barter),
                         const Spacer(),
-                        const Icon(Icons.visibility_outlined, color: Color(0xFF717171), size: 20),
+                        const Icon(Icons.visibility_outlined,
+                            color: Color(0xFF717171), size: 20),
                         const SizedBox(width: 6),
-                        Text('$views', style: const TextStyle(color: Color(0xFF717171))),
+                        Text('$views',
+                            style: const TextStyle(color: Color(0xFF717171))),
                         const SizedBox(width: 16),
-                        const Icon(Icons.favorite_border, color: Color(0xFF717171), size: 20),
+                        const Icon(Icons.favorite_border,
+                            color: Color(0xFF717171), size: 20),
                         const SizedBox(width: 6),
-                        Text('$likes', style: const TextStyle(color: Color(0xFF717171))),
+                        Text('$likes',
+                            style: const TextStyle(color: Color(0xFF717171))),
                       ]),
                     ],
                   ),

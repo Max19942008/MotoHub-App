@@ -16,6 +16,11 @@ const _motorbikeFields = '''
 
 const _meFields = 'meLiked { myFavorite } meInterested { myInterest }';
 
+const _agentFields = '''
+  _id memberNick memberFullName memberPhone memberImage memberRank memberType memberAddress
+  memberProperties memberViews memberLikes meLiked { myFavorite }
+''';
+
 const _partFields = '''
   _id partCategory partType partLocation partBrand partCondition partTitle
   partPrice partCurrency partStockCount partCompatibleBrands partViews partLikes partRank
@@ -35,7 +40,8 @@ enum SortOption {
   final String field;
   final String direction;
 
-  String fieldFor(String prefix) => field == 'createdAt' ? field : '$prefix$field';
+  String fieldFor(String prefix) =>
+      field == 'createdAt' ? field : '$prefix$field';
 }
 
 /// Filters for the motorbike list. Empty = no filter.
@@ -110,7 +116,10 @@ class MotorbikeFilter {
         if (minPrice != null || maxPrice != null)
           'pricesRange': {'start': minPrice ?? 0, 'end': maxPrice ?? 2000000},
         if (minYear != null || maxYear != null)
-          'yearRange': {'start': minYear ?? 1970, 'end': maxYear ?? DateTime.now().year},
+          'yearRange': {
+            'start': minYear ?? 1970,
+            'end': maxYear ?? DateTime.now().year
+          },
       };
 }
 
@@ -141,7 +150,11 @@ class PartFilter {
   SortOption get effectiveSort => sort ?? SortOption.recent;
 
   int get activeCount =>
-      types.length + brands.length + conditions.length + locations.length + (minPrice != null || maxPrice != null ? 1 : 0);
+      types.length +
+      brands.length +
+      conditions.length +
+      locations.length +
+      (minPrice != null || maxPrice != null ? 1 : 0);
 
   PartFilter copyWith({
     String? text,
@@ -183,7 +196,8 @@ class Repository {
 
   final _gql = GraphQLClient.instance;
 
-  Future<PageResult<Motorbike>> motorbikes(MotorbikeFilter filter, int page) async {
+  Future<PageResult<Motorbike>> motorbikes(
+      MotorbikeFilter filter, int page) async {
     final data = await _gql.query('''
       query (\$input: PropertiesInquiry!) {
         getProperties(input: \$input) {
@@ -202,7 +216,9 @@ class Repository {
     });
     final result = data['getProperties'] as Map<String, dynamic>;
     return PageResult(
-      (result['list'] as List).map((e) => Motorbike.fromJson(e as Map<String, dynamic>)).toList(),
+      (result['list'] as List)
+          .map((e) => Motorbike.fromJson(e as Map<String, dynamic>))
+          .toList(),
       _total(result),
     );
   }
@@ -212,7 +228,13 @@ class Repository {
     final data = await _gql.query('''
       query (\$input: PropertiesInquiry!) { getProperties(input: \$input) { list { $_motorbikeFields } } }
     ''', variables: {
-      'input': {'page': 1, 'limit': limit, 'sort': sort, 'direction': 'DESC', 'search': <String, dynamic>{}},
+      'input': {
+        'page': 1,
+        'limit': limit,
+        'sort': sort,
+        'direction': 'DESC',
+        'search': <String, dynamic>{}
+      },
     });
     return ((data['getProperties'] as Map<String, dynamic>)['list'] as List)
         .map((e) => Motorbike.fromJson(e as Map<String, dynamic>))
@@ -229,7 +251,9 @@ class Repository {
         'limit': limit,
         'sort': 'partRank',
         'direction': 'DESC',
-        'search': {'categoryList': [category]},
+        'search': {
+          'categoryList': [category]
+        },
       },
     });
     return ((data['getParts'] as Map<String, dynamic>)['list'] as List)
@@ -241,10 +265,16 @@ class Repository {
   Future<List<Agent>> topAgents(int limit) async {
     final data = await _gql.query('''
       query (\$input: AgentsInquiry!) {
-        getAgents(input: \$input) { list { _id memberNick memberPhone memberImage memberRank memberType } }
+        getAgents(input: \$input) { list { $_agentFields } }
       }
     ''', variables: {
-      'input': {'page': 1, 'limit': limit, 'sort': 'memberRank', 'direction': 'DESC', 'search': <String, dynamic>{}},
+      'input': {
+        'page': 1,
+        'limit': limit,
+        'sort': 'memberRank',
+        'direction': 'DESC',
+        'search': <String, dynamic>{}
+      },
     });
     return ((data['getAgents'] as Map<String, dynamic>)['list'] as List)
         .map((e) => Agent.fromJson(e as Map<String, dynamic>))
@@ -277,7 +307,9 @@ class Repository {
     });
     final result = data['getParts'] as Map<String, dynamic>;
     return PageResult(
-      (result['list'] as List).map((e) => Part.fromJson(e as Map<String, dynamic>)).toList(),
+      (result['list'] as List)
+          .map((e) => Part.fromJson(e as Map<String, dynamic>))
+          .toList(),
       _total(result),
     );
   }
@@ -291,18 +323,22 @@ class Repository {
 
   // ---- detail page actions (need a logged-in member) ----
 
-  Future<void> likeMotorbike(String id) =>
-      _gql.query(r'mutation ($id: String!) { likeTargetProperty(propertyId: $id) { _id } }', variables: {'id': id});
+  Future<void> likeMotorbike(String id) => _gql.query(
+      r'mutation ($id: String!) { likeTargetProperty(propertyId: $id) { _id } }',
+      variables: {'id': id});
 
-  Future<void> likePart(String id) =>
-      _gql.query(r'mutation ($id: String!) { likeTargetPart(partId: $id) { _id } }', variables: {'id': id});
+  Future<void> likePart(String id) => _gql.query(
+      r'mutation ($id: String!) { likeTargetPart(partId: $id) { _id } }',
+      variables: {'id': id});
 
   /// Tells the dealer "I'm interested" (one-way, like the site).
   Future<void> notifyInterest(String id) =>
-      _gql.query(r'mutation ($id: String!) { notifyInterest(propertyId: $id) }', variables: {'id': id});
+      _gql.query(r'mutation ($id: String!) { notifyInterest(propertyId: $id) }',
+          variables: {'id': id});
 
   Future<void> notifyPartInterest(String id) =>
-      _gql.query(r'mutation ($id: String!) { notifyPartInterest(partId: $id) }', variables: {'id': id});
+      _gql.query(r'mutation ($id: String!) { notifyPartInterest(partId: $id) }',
+          variables: {'id': id});
 
   Future<PageResult<Comment>> comments(String refId, int page) async {
     final data = await _gql.query(r'''
@@ -323,16 +359,23 @@ class Repository {
     });
     final result = data['getComments'] as Map<String, dynamic>;
     return PageResult(
-      (result['list'] as List).map((e) => Comment.fromJson(e as Map<String, dynamic>)).toList(),
+      (result['list'] as List)
+          .map((e) => Comment.fromJson(e as Map<String, dynamic>))
+          .toList(),
       _total(result),
     );
   }
 
   /// [group] is PROPERTY or PART.
-  Future<void> addComment(String group, String refId, String content) => _gql.query(
+  Future<void> addComment(String group, String refId, String content) =>
+      _gql.query(
         r'mutation ($input: CommentInput!) { createComment(input: $input) { _id } }',
         variables: {
-          'input': {'commentGroup': group, 'commentRefId': refId, 'commentContent': content},
+          'input': {
+            'commentGroup': group,
+            'commentRefId': refId,
+            'commentContent': content
+          },
         },
       );
 
@@ -346,7 +389,9 @@ class Repository {
         'limit': 9,
         'sort': 'createdAt',
         'direction': 'DESC',
-        'search': {'locationList': [location]},
+        'search': {
+          'locationList': [location]
+        },
       },
     });
     return ((data['getProperties'] as Map<String, dynamic>)['list'] as List)
@@ -364,7 +409,9 @@ class Repository {
         'limit': 9,
         'sort': 'createdAt',
         'direction': 'DESC',
-        'search': {'categoryList': [category]},
+        'search': {
+          'categoryList': [category]
+        },
       },
     });
     return ((data['getParts'] as Map<String, dynamic>)['list'] as List)
@@ -372,9 +419,84 @@ class Repository {
         .toList();
   }
 
+  // ---- agents ----
+
+  /// Agents page. [sort]: createdAt | memberLikes | memberViews.
+  Future<PageResult<Agent>> agents(int page,
+      {String sort = 'createdAt',
+      String direction = 'DESC',
+      String text = ''}) async {
+    final data = await _gql.query('''
+      query (\$input: AgentsInquiry!) {
+        getAgents(input: \$input) { list { $_agentFields } metaCounter { total } }
+      }
+    ''', variables: {
+      'input': {
+        'page': page,
+        'limit': 10,
+        'sort': sort,
+        'direction': direction,
+        'search': {if (text.trim().isNotEmpty) 'text': text.trim()},
+      },
+    });
+    final result = data['getAgents'] as Map<String, dynamic>;
+    return PageResult(
+      (result['list'] as List)
+          .map((e) => Agent.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      _total(result),
+    );
+  }
+
+  Future<Agent> agent(String id) async {
+    final data = await _gql.query('''
+      query (\$id: String!) { getMember(memberId: \$id) { $_agentFields meFollowed { myFollowing } } }
+    ''', variables: {'id': id});
+    return Agent.fromJson(data['getMember'] as Map<String, dynamic>);
+  }
+
+  /// "Bikes (13)" tab of an agent page.
+  Future<PageResult<Motorbike>> agentMotorbikes(
+      String memberId, int page) async {
+    final data = await _gql.query('''
+      query (\$input: PropertiesInquiry!) {
+        getProperties(input: \$input) { list { $_motorbikeFields } metaCounter { total } }
+      }
+    ''', variables: {
+      'input': {
+        'page': page,
+        'limit': 9,
+        'sort': 'createdAt',
+        'direction': 'DESC',
+        'search': {'memberId': memberId},
+      },
+    });
+    final result = data['getProperties'] as Map<String, dynamic>;
+    return PageResult(
+      (result['list'] as List)
+          .map((e) => Motorbike.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      _total(result),
+    );
+  }
+
+  Future<void> likeMember(String id) => _gql.query(
+      r'mutation ($id: String!) { likeTargetMember(memberId: $id) { _id } }',
+      variables: {'id': id});
+
+  Future<void> follow(String id) =>
+      _gql.query(r'mutation ($id: String!) { subscribe(input: $id) { _id } }',
+          variables: {'id': id});
+
+  Future<void> unfollow(String id) =>
+      _gql.query(r'mutation ($id: String!) { unsubscribe(input: $id) { _id } }',
+          variables: {'id': id});
+
   int _total(Map<String, dynamic> result) {
     final counter = result['metaCounter'];
-    if (counter is List && counter.isNotEmpty) return (counter.first['total'] as num?)?.toInt() ?? 0;
+    if (counter is List && counter.isNotEmpty) {
+      return (counter.first['total'] as num?)?.toInt() ?? 0;
+    }
     return 0;
   }
 }

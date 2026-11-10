@@ -1,19 +1,57 @@
 // Uzbek labels for backend enum values, plus formatting helpers.
 
-const motorbikeBrands = ['HONDA', 'YAMAHA', 'SUZUKI', 'KAWASAKI', 'DUCATI', 'BMW', 'HARLEY_DAVIDSON'];
+const motorbikeBrands = [
+  'HONDA',
+  'YAMAHA',
+  'SUZUKI',
+  'KAWASAKI',
+  'DUCATI',
+  'BMW',
+  'HARLEY_DAVIDSON'
+];
 const motorbikeTypes = ['SPORT', 'CRUISER', 'SCOOTER'];
 const motorbikeConditions = ['NEW', 'USED'];
 
 const partBrands = [...motorbikeBrands, 'UNIVERSAL', 'OTHER'];
 const partConditions = ['NEW', 'USED', 'REFURBISHED'];
 const sparePartTypes = [
-  'ENGINE', 'EXHAUST', 'BRAKE', 'SUSPENSION', 'TIRE', 'BATTERY', 'FILTER', 'CHAIN', 'ELECTRICAL', 'BODY_PANEL', 'OTHER',
+  'ENGINE',
+  'EXHAUST',
+  'BRAKE',
+  'SUSPENSION',
+  'TIRE',
+  'BATTERY',
+  'FILTER',
+  'CHAIN',
+  'ELECTRICAL',
+  'BODY_PANEL',
+  'OTHER',
 ];
-const accessoryTypes = ['HELMET', 'GLOVES', 'JACKET', 'BOOTS', 'LUGGAGE', 'PHONE_MOUNT', 'COVER', 'OTHER'];
+const accessoryTypes = [
+  'HELMET',
+  'GLOVES',
+  'JACKET',
+  'BOOTS',
+  'LUGGAGE',
+  'PHONE_MOUNT',
+  'COVER',
+  'OTHER'
+];
 
 const locations = [
-  'TASHKENT', 'ANDIJAN', 'BUKHARA', 'FERGANA', 'JIZZAKH', 'KHOREZM', 'NAMANGAN',
-  'NAVOI', 'KASHKADARYA', 'SAMARKAND', 'SIRDARYA', 'SURKHANDARYA', 'KARAKALPAKSTAN',
+  'TASHKENT',
+  'ANDIJAN',
+  'BUKHARA',
+  'FERGANA',
+  'JIZZAKH',
+  'KHOREZM',
+  'NAMANGAN',
+  'NAVOI',
+  'KASHKADARYA',
+  'SAMARKAND',
+  'SIRDARYA',
+  'SURKHANDARYA',
+  'KARAKALPAKSTAN',
 ];
 
 const _labels = <String, String>{
@@ -25,15 +63,22 @@ const _labels = <String, String>{
   'NEW': 'Yangi', 'USED': 'Ishlatilgan', 'REFURBISHED': 'Tiklangan',
   // part categories & types
   'SPARE_PART': 'Ehtiyot qism', 'ACCESSORY': 'Aksessuar',
-  'ENGINE': 'Dvigatel', 'EXHAUST': 'Glushitel', 'BRAKE': 'Tormoz', 'SUSPENSION': 'Amortizator',
-  'TIRE': 'Shina', 'BATTERY': 'Akkumulyator', 'FILTER': 'Filtr', 'CHAIN': 'Zanjir',
-  'ELECTRICAL': 'Elektrika', 'BODY_PANEL': 'Kuzov detali', 'HELMET': 'Dubulg\'a',
-  'GLOVES': 'Qo\'lqop', 'JACKET': 'Kurtka', 'BOOTS': 'Botinka', 'LUGGAGE': 'Yukxalta',
+  'ENGINE': 'Dvigatel', 'EXHAUST': 'Glushitel', 'BRAKE': 'Tormoz',
+  'SUSPENSION': 'Amortizator',
+  'TIRE': 'Shina', 'BATTERY': 'Akkumulyator', 'FILTER': 'Filtr',
+  'CHAIN': 'Zanjir',
+  'ELECTRICAL': 'Elektrika', 'BODY_PANEL': 'Kuzov detali',
+  'HELMET': 'Dubulg\'a',
+  'GLOVES': 'Qo\'lqop', 'JACKET': 'Kurtka', 'BOOTS': 'Botinka',
+  'LUGGAGE': 'Yukxalta',
   'PHONE_MOUNT': 'Telefon ushlagich', 'COVER': 'G\'ilof', 'OTHER': 'Boshqa',
   // regions
-  'TASHKENT': 'Toshkent', 'ANDIJAN': 'Andijon', 'BUKHARA': 'Buxoro', 'FERGANA': 'Farg\'ona',
-  'JIZZAKH': 'Jizzax', 'KHOREZM': 'Xorazm', 'NAMANGAN': 'Namangan', 'NAVOI': 'Navoiy',
-  'KASHKADARYA': 'Qashqadaryo', 'SAMARKAND': 'Samarqand', 'SIRDARYA': 'Sirdaryo',
+  'TASHKENT': 'Toshkent', 'ANDIJAN': 'Andijon', 'BUKHARA': 'Buxoro',
+  'FERGANA': 'Farg\'ona',
+  'JIZZAKH': 'Jizzax', 'KHOREZM': 'Xorazm', 'NAMANGAN': 'Namangan',
+  'NAVOI': 'Navoiy',
+  'KASHKADARYA': 'Qashqadaryo', 'SAMARKAND': 'Samarqand',
+  'SIRDARYA': 'Sirdaryo',
   'SURKHANDARYA': 'Surxondaryo', 'KARAKALPAKSTAN': 'Qoraqalpog\'iston',
 };
 
@@ -43,7 +88,9 @@ String label(String value) {
   if (known != null) return known;
   if (value.isEmpty) return value;
   final words = value.toLowerCase().split('_');
-  return words.map((w) => w.isEmpty ? w : w[0].toUpperCase() + w.substring(1)).join(' ');
+  return words
+      .map((w) => w.isEmpty ? w : w[0].toUpperCase() + w.substring(1))
+      .join(' ');
 }
 
 /// 12500 -> "12 500".

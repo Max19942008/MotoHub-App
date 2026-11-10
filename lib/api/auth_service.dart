@@ -9,7 +9,13 @@ import 'graphql_client.dart';
 /// The logged-in member, read from the access token's payload (the backend
 /// signs the member document into the JWT, minus the password).
 class Member {
-  Member({required this.id, required this.nick, this.phone, this.image, this.type, this.fullName});
+  Member(
+      {required this.id,
+      required this.nick,
+      this.phone,
+      this.image,
+      this.type,
+      this.fullName});
 
   final String id;
   final String nick;
@@ -130,7 +136,10 @@ class AuthService extends ChangeNotifier {
     final token = _accessToken;
     if (token == null) return null;
     final exp = _expiry(token);
-    if (exp == null || DateTime.now().isBefore(exp.subtract(const Duration(seconds: 60)))) return token;
+    if (exp == null ||
+        DateTime.now().isBefore(exp.subtract(const Duration(seconds: 60)))) {
+      return token;
+    }
     // One refresh at a time: the refresh token is single-use.
     return _refreshing ??= _refresh().whenComplete(() => _refreshing = null);
   }
@@ -159,12 +168,16 @@ class AuthService extends ChangeNotifier {
 
   Future<void> _saveTokens(Map<String, dynamic> pair) async {
     final access = pair['accessToken'] as String?;
-    if (access == null || access.isEmpty) throw ApiException('Kirish amalga oshmadi.');
+    if (access == null || access.isEmpty) {
+      throw ApiException('Kirish amalga oshmadi.');
+    }
     _accessToken = access;
     _refreshToken = pair['refreshToken'] as String? ?? _refreshToken;
     _member = _memberFromToken(access);
     await _storage.write(key: _kAccess, value: _accessToken);
-    if (_refreshToken != null) await _storage.write(key: _kRefresh, value: _refreshToken);
+    if (_refreshToken != null) {
+      await _storage.write(key: _kRefresh, value: _refreshToken);
+    }
     notifyListeners();
   }
 
@@ -181,7 +194,9 @@ class AuthService extends ChangeNotifier {
   static Map<String, dynamic>? _payload(String token) {
     try {
       final part = token.split('.')[1];
-      return jsonDecode(utf8.decode(base64Url.decode(base64Url.normalize(part)))) as Map<String, dynamic>;
+      return jsonDecode(
+              utf8.decode(base64Url.decode(base64Url.normalize(part))))
+          as Map<String, dynamic>;
     } catch (_) {
       return null;
     }
@@ -189,7 +204,9 @@ class AuthService extends ChangeNotifier {
 
   static DateTime? _expiry(String token) {
     final exp = _payload(token)?['exp'];
-    return exp is num ? DateTime.fromMillisecondsSinceEpoch(exp.toInt() * 1000) : null;
+    return exp is num
+        ? DateTime.fromMillisecondsSinceEpoch(exp.toInt() * 1000)
+        : null;
   }
 
   static Member? _memberFromToken(String token) {

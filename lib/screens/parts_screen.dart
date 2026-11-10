@@ -13,7 +13,8 @@ import 'part_detail_screen.dart';
 /// header card with sort + filter buttons, then cards.
 /// [category] is SPARE_PART, ACCESSORY or ALL.
 class PartsScreen extends StatefulWidget {
-  const PartsScreen({super.key, this.category = 'SPARE_PART', this.onCategoryChanged});
+  const PartsScreen(
+      {super.key, this.category = 'SPARE_PART', this.onCategoryChanged});
 
   final String category;
   final ValueChanged<String>? onCategoryChanged;
@@ -22,7 +23,8 @@ class PartsScreen extends StatefulWidget {
   State<PartsScreen> createState() => _PartsScreenState();
 }
 
-class _PartsScreenState extends State<PartsScreen> with AutomaticKeepAliveClientMixin {
+class _PartsScreenState extends State<PartsScreen>
+    with AutomaticKeepAliveClientMixin {
   late PartFilter _filter = PartFilter(category: widget.category);
   int _version = 0;
 
@@ -33,7 +35,8 @@ class _PartsScreenState extends State<PartsScreen> with AutomaticKeepAliveClient
   void didUpdateWidget(PartsScreen old) {
     super.didUpdateWidget(old);
     // The drawer picked another category.
-    if (widget.category != old.category && widget.category != _filter.category) {
+    if (widget.category != old.category &&
+        widget.category != _filter.category) {
       _filter = PartFilter(category: widget.category);
       _version++;
     }
@@ -51,7 +54,8 @@ class _PartsScreenState extends State<PartsScreen> with AutomaticKeepAliveClient
     widget.onCategoryChanged?.call(category);
   }
 
-  Set<String> _toggle(Set<String> s, String v) => s.contains(v) ? ({...s}..remove(v)) : {...s, v};
+  Set<String> _toggle(Set<String> s, String v) =>
+      s.contains(v) ? ({...s}..remove(v)) : {...s, v};
 
   String get _title => switch (_filter.category) {
         'SPARE_PART' => 'Ehtiyot qismlar',
@@ -62,7 +66,10 @@ class _PartsScreenState extends State<PartsScreen> with AutomaticKeepAliveClient
   List<String> get _types => switch (_filter.category) {
         'SPARE_PART' => sparePartTypes,
         'ACCESSORY' => accessoryTypes,
-        _ => [...sparePartTypes, ...accessoryTypes.where((t) => !sparePartTypes.contains(t))],
+        _ => [
+            ...sparePartTypes,
+            ...accessoryTypes.where((t) => !sparePartTypes.contains(t))
+          ],
       };
 
   Widget _tabs() => Padding(
@@ -71,9 +78,18 @@ class _PartsScreenState extends State<PartsScreen> with AutomaticKeepAliveClient
           spacing: 12,
           runSpacing: 2,
           children: [
-            _TabPill(label: 'Hammasi', active: _filter.category == 'ALL', onTap: () => _switch('ALL')),
-            _TabPill(label: 'Ehtiyot qismlar', active: _filter.category == 'SPARE_PART', onTap: () => _switch('SPARE_PART')),
-            _TabPill(label: 'Aksessuarlar', active: _filter.category == 'ACCESSORY', onTap: () => _switch('ACCESSORY')),
+            _TabPill(
+                label: 'Hammasi',
+                active: _filter.category == 'ALL',
+                onTap: () => _switch('ALL')),
+            _TabPill(
+                label: 'Ehtiyot qismlar',
+                active: _filter.category == 'SPARE_PART',
+                onTap: () => _switch('SPARE_PART')),
+            _TabPill(
+                label: 'Aksessuarlar',
+                active: _filter.category == 'ACCESSORY',
+                onTap: () => _switch('ACCESSORY')),
           ],
         ),
       );
@@ -84,8 +100,11 @@ class _PartsScreenState extends State<PartsScreen> with AutomaticKeepAliveClient
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 14),
-        SortButton(sort: f.sort, onChanged: (s) => _setFilter(f.copyWith(sort: s))),
-        const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: Divider(height: 1, color: Color(0xFFEAEAEA))),
+        SortButton(
+            sort: f.sort, onChanged: (s) => _setFilter(f.copyWith(sort: s))),
+        const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Divider(height: 1, color: Color(0xFFEAEAEA))),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -95,25 +114,29 @@ class _PartsScreenState extends State<PartsScreen> with AutomaticKeepAliveClient
               label: 'Tur',
               options: _types,
               selected: f.types,
-              onToggle: (v) => _setFilter(f.copyWith(types: _toggle(f.types, v))),
+              onToggle: (v) =>
+                  _setFilter(f.copyWith(types: _toggle(f.types, v))),
             ),
             MultiFilterButton(
               label: 'Brend',
               options: partBrands,
               selected: f.brands,
-              onToggle: (v) => _setFilter(f.copyWith(brands: _toggle(f.brands, v))),
+              onToggle: (v) =>
+                  _setFilter(f.copyWith(brands: _toggle(f.brands, v))),
             ),
             MultiFilterButton(
               label: 'Holati',
               options: partConditions,
               selected: f.conditions,
-              onToggle: (v) => _setFilter(f.copyWith(conditions: _toggle(f.conditions, v))),
+              onToggle: (v) =>
+                  _setFilter(f.copyWith(conditions: _toggle(f.conditions, v))),
             ),
             MultiFilterButton(
               label: 'Manzil',
               options: locations,
               selected: f.locations,
-              onToggle: (v) => _setFilter(f.copyWith(locations: _toggle(f.locations, v))),
+              onToggle: (v) =>
+                  _setFilter(f.copyWith(locations: _toggle(f.locations, v))),
             ),
             RangeFilterButton(
               text: f.minPrice == null && f.maxPrice == null
@@ -126,9 +149,11 @@ class _PartsScreenState extends State<PartsScreen> with AutomaticKeepAliveClient
               format: usd,
               from: f.minPrice,
               to: f.maxPrice,
-              onChanged: (a, b) => _setFilter(f.copyWith(minPrice: () => a, maxPrice: () => b)),
+              onChanged: (a, b) =>
+                  _setFilter(f.copyWith(minPrice: () => a, maxPrice: () => b)),
             ),
-            ResetFilterButton(onPressed: () => _setFilter(PartFilter(category: f.category))),
+            ResetFilterButton(
+                onPressed: () => _setFilter(PartFilter(category: f.category))),
           ],
         ),
         const SizedBox(height: 8),
@@ -175,7 +200,8 @@ class _PartsScreenState extends State<PartsScreen> with AutomaticKeepAliveClient
 }
 
 class _TabPill extends StatelessWidget {
-  const _TabPill({required this.label, required this.active, required this.onTap});
+  const _TabPill(
+      {required this.label, required this.active, required this.onTap});
   final String label;
   final bool active;
   final VoidCallback onTap;
@@ -186,7 +212,9 @@ class _TabPill extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: Material(
         color: active ? Brand.green : Colors.white,
-        shape: StadiumBorder(side: BorderSide(color: active ? Brand.green : const Color(0xFFE5E7EB))),
+        shape: StadiumBorder(
+            side: BorderSide(
+                color: active ? Brand.green : const Color(0xFFE5E7EB))),
         elevation: active ? 6 : 0,
         shadowColor: Brand.green.withValues(alpha: 0.5),
         child: InkWell(
@@ -196,7 +224,10 @@ class _TabPill extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 9),
             child: Text(
               label,
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: active ? Colors.white : Brand.ink),
+              style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  color: active ? Colors.white : Brand.ink),
             ),
           ),
         ),

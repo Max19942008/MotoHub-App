@@ -43,13 +43,16 @@ class GraphQLClient {
             Uri.parse(graphqlUrl),
             headers: {
               'Content-Type': 'application/json',
-              if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+              if (token != null && token.isNotEmpty)
+                'Authorization': 'Bearer $token',
             },
             body: jsonEncode({'query': document, 'variables': variables}),
           )
           .timeout(const Duration(seconds: 90));
     } on TimeoutException {
-      throw ApiException('Server javob bermadi. Keyinroq qayta urinib ko\'ring.', isNetwork: true);
+      throw ApiException(
+          'Server javob bermadi. Keyinroq qayta urinib ko\'ring.',
+          isNetwork: true);
     } on SocketException {
       throw ApiException('Internet aloqasi yo\'q.', isNetwork: true);
     } on http.ClientException {
@@ -58,10 +61,12 @@ class GraphQLClient {
 
     Map<String, dynamic> body;
     try {
-      body = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      body =
+          jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
     } catch (_) {
       // Render answers with an HTML 502/503 page while the instance boots.
-      throw ApiException('Server xatosi (${response.statusCode}).', isNetwork: response.statusCode >= 500);
+      throw ApiException('Server xatosi (${response.statusCode}).',
+          isNetwork: response.statusCode >= 500);
     }
 
     final errors = body['errors'];
@@ -69,26 +74,34 @@ class GraphQLClient {
       final first = errors.first;
       final raw = first is Map ? first['message'] : null;
       // class-validator errors arrive as a list of messages.
-      final message = raw is List ? raw.join('\n') : '${raw ?? 'Server xatosi.'}';
+      final message =
+          raw is List ? raw.join('\n') : '${raw ?? 'Server xatosi.'}';
       throw ApiException(_translate(message));
     }
     final data = body['data'];
-    if (data is! Map<String, dynamic>) throw ApiException('Server bo\'sh javob qaytardi.');
+    if (data is! Map<String, dynamic>) {
+      throw ApiException('Server bo\'sh javob qaytardi.');
+    }
     return data;
   }
 
   /// Server messages are English; show the ones users hit most in Uzbek.
   static String _translate(String message) {
     const known = {
-      'No member with that member nick!': 'Bunday nikdagi foydalanuvchi topilmadi.',
+      'No member with that member nick!':
+          'Bunday nikdagi foydalanuvchi topilmadi.',
       'Wrong password, try again!': "Parol noto'g'ri.",
-      'Already used nick or phone': 'Bu nik yoki telefon raqam allaqachon band.',
+      'Already used nick or phone':
+          'Bu nik yoki telefon raqam allaqachon band.',
       'You have been blocked!': 'Hisobingiz bloklangan.',
-      'This account signs in with Google!': 'Bu hisob Google orqali kiradi — saytdan kiring.',
+      'This account signs in with Google!':
+          'Bu hisob Google orqali kiradi — saytdan kiring.',
       'AI assistant is not configured': 'AI yordamchi hozircha sozlanmagan.',
-      'Assistant is busy, please try again in a minute': "Yordamchi band, bir daqiqadan so'ng urinib ko'ring.",
+      'Assistant is busy, please try again in a minute':
+          "Yordamchi band, bir daqiqadan so'ng urinib ko'ring.",
       'Assistant is unavailable right now': 'Yordamchi hozir ishlamayapti.',
-      'Too many questions — please wait a few minutes': "Juda ko'p savol — bir necha daqiqa kuting.",
+      'Too many questions — please wait a few minutes':
+          "Juda ko'p savol — bir necha daqiqa kuting.",
     };
     return known[message] ?? message;
   }

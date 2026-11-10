@@ -16,9 +16,11 @@ class MotorbikesScreen extends StatefulWidget {
   State<MotorbikesScreen> createState() => _MotorbikesScreenState();
 }
 
-class _MotorbikesScreenState extends State<MotorbikesScreen> with AutomaticKeepAliveClientMixin {
+class _MotorbikesScreenState extends State<MotorbikesScreen>
+    with AutomaticKeepAliveClientMixin {
   MotorbikeFilter _filter = MotorbikeFilter();
-  int _version = 0; // bumps on every filter change so the list restarts from page 1
+  int _version =
+      0; // bumps on every filter change so the list restarts from page 1
 
   @override
   bool get wantKeepAlive => true;
@@ -28,7 +30,8 @@ class _MotorbikesScreenState extends State<MotorbikesScreen> with AutomaticKeepA
         _version++;
       });
 
-  Set<String> _toggle(Set<String> s, String v) => s.contains(v) ? ({...s}..remove(v)) : {...s, v};
+  Set<String> _toggle(Set<String> s, String v) =>
+      s.contains(v) ? ({...s}..remove(v)) : {...s, v};
 
   Widget _filters() {
     final f = _filter;
@@ -37,8 +40,11 @@ class _MotorbikesScreenState extends State<MotorbikesScreen> with AutomaticKeepA
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 14),
-        SortButton(sort: f.sort, onChanged: (s) => _setFilter(f.copyWith(sort: s))),
-        const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: Divider(height: 1, color: Color(0xFFEAEAEA))),
+        SortButton(
+            sort: f.sort, onChanged: (s) => _setFilter(f.copyWith(sort: s))),
+        const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Divider(height: 1, color: Color(0xFFEAEAEA))),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -48,25 +54,29 @@ class _MotorbikesScreenState extends State<MotorbikesScreen> with AutomaticKeepA
               label: 'Brend',
               options: motorbikeBrands,
               selected: f.brands,
-              onToggle: (v) => _setFilter(f.copyWith(brands: _toggle(f.brands, v))),
+              onToggle: (v) =>
+                  _setFilter(f.copyWith(brands: _toggle(f.brands, v))),
             ),
             MultiFilterButton(
               label: 'Tur',
               options: motorbikeTypes,
               selected: f.types,
-              onToggle: (v) => _setFilter(f.copyWith(types: _toggle(f.types, v))),
+              onToggle: (v) =>
+                  _setFilter(f.copyWith(types: _toggle(f.types, v))),
             ),
             MultiFilterButton(
               label: 'Holati',
               options: motorbikeConditions,
               selected: f.conditions,
-              onToggle: (v) => _setFilter(f.copyWith(conditions: _toggle(f.conditions, v))),
+              onToggle: (v) =>
+                  _setFilter(f.copyWith(conditions: _toggle(f.conditions, v))),
             ),
             MultiFilterButton(
               label: 'Manzil',
               options: locations,
               selected: f.locations,
-              onToggle: (v) => _setFilter(f.copyWith(locations: _toggle(f.locations, v))),
+              onToggle: (v) =>
+                  _setFilter(f.copyWith(locations: _toggle(f.locations, v))),
             ),
             RangeFilterButton(
               text: '${f.minYear ?? 2000} - ${f.maxYear ?? thisYear}',
@@ -77,7 +87,8 @@ class _MotorbikesScreenState extends State<MotorbikesScreen> with AutomaticKeepA
               format: (v) => '$v',
               from: f.minYear,
               to: f.maxYear,
-              onChanged: (a, b) => _setFilter(f.copyWith(minYear: () => a, maxYear: () => b)),
+              onChanged: (a, b) =>
+                  _setFilter(f.copyWith(minYear: () => a, maxYear: () => b)),
             ),
             RangeFilterButton(
               text: '${usd(f.minPrice ?? 0)} - ${usd(f.maxPrice ?? 2000000)}',
@@ -88,7 +99,8 @@ class _MotorbikesScreenState extends State<MotorbikesScreen> with AutomaticKeepA
               format: usd,
               from: f.minPrice,
               to: f.maxPrice,
-              onChanged: (a, b) => _setFilter(f.copyWith(minPrice: () => a, maxPrice: () => b)),
+              onChanged: (a, b) =>
+                  _setFilter(f.copyWith(minPrice: () => a, maxPrice: () => b)),
             ),
             ResetFilterButton(onPressed: () => _setFilter(MotorbikeFilter())),
           ],
@@ -106,7 +118,8 @@ class _MotorbikesScreenState extends State<MotorbikesScreen> with AutomaticKeepA
       title: 'Mototsikllar',
       header: _filters(),
       fetch: (page) => Repository.instance.motorbikes(_filter, page),
-      emptyMessage: "Bunday mototsikl topilmadi.\nFiltrlarni o'zgartirib ko'ring.",
+      emptyMessage:
+          "Bunday mototsikl topilmadi.\nFiltrlarni o'zgartirib ko'ring.",
       itemBuilder: (context, bike) => ListingCard(
         heroTag: 'bike-${bike.id}',
         image: bike.images.isEmpty ? null : bike.images.first,
@@ -127,7 +140,8 @@ class _MotorbikesScreenState extends State<MotorbikesScreen> with AutomaticKeepA
         action: 'Sotib Olish',
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => MotorbikeDetailScreen(initial: bike)),
+          MaterialPageRoute(
+              builder: (_) => MotorbikeDetailScreen(initial: bike)),
         ),
       ),
     );

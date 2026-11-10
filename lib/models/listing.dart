@@ -1,6 +1,11 @@
 /// Seller info shown on detail pages.
 class Seller {
-  Seller({required this.id, required this.nick, this.phone, this.image, this.type});
+  Seller(
+      {required this.id,
+      required this.nick,
+      this.phone,
+      this.image,
+      this.type});
 
   final String id;
   final String nick;
@@ -63,6 +68,7 @@ class Motorbike {
   final int views;
   final int likes;
   final num rank;
+
   /// Set only on the detail query, for the logged-in member.
   final bool liked;
   final bool interested;
@@ -91,7 +97,9 @@ class Motorbike {
         rank: (j['propertyRank'] as num?) ?? 0,
         liked: _flag(j['meLiked'], 'myFavorite'),
         interested: _flag(j['meInterested'], 'myInterest'),
-        images: ((j['propertyImages'] as List?) ?? const []).map((e) => '$e').toList(),
+        images: ((j['propertyImages'] as List?) ?? const [])
+            .map((e) => '$e')
+            .toList(),
         barter: j['propertyBarter'] == true,
         rent: j['propertyRent'] == true,
         description: j['propertyDesc'] as String?,
@@ -140,6 +148,7 @@ class Part {
   final int views;
   final int likes;
   final num rank;
+
   /// Set only on the detail query, for the logged-in member.
   final bool liked;
   final bool interested;
@@ -160,13 +169,16 @@ class Part {
         price: (j['partPrice'] as num?) ?? 0,
         currency: '${j['partCurrency'] ?? 'USD'}',
         stock: (j['partStockCount'] as num?)?.toInt() ?? 1,
-        compatibleBrands: ((j['partCompatibleBrands'] as List?) ?? const []).map((e) => '$e').toList(),
+        compatibleBrands: ((j['partCompatibleBrands'] as List?) ?? const [])
+            .map((e) => '$e')
+            .toList(),
         views: (j['partViews'] as num?)?.toInt() ?? 0,
         likes: (j['partLikes'] as num?)?.toInt() ?? 0,
         rank: (j['partRank'] as num?) ?? 0,
         liked: _flag(j['meLiked'], 'myFavorite'),
         interested: _flag(j['meInterested'], 'myInterest'),
-        images: ((j['partImages'] as List?) ?? const []).map((e) => '$e').toList(),
+        images:
+            ((j['partImages'] as List?) ?? const []).map((e) => '$e').toList(),
         barter: j['partBarter'] == true,
         description: j['partDesc'] as String?,
         createdAt: DateTime.tryParse('${j['createdAt']}'),
@@ -180,16 +192,37 @@ class PageResult<T> {
   final int total;
 }
 
-/// A dealer shown in the home "Elite riders" carousel.
+/// A dealer (member of type AGENT).
 class Agent {
-  Agent({required this.id, required this.nick, this.phone, this.image, this.rank = 0, this.type});
+  Agent({
+    required this.id,
+    required this.nick,
+    this.phone,
+    this.image,
+    this.rank = 0,
+    this.type,
+    this.address,
+    this.properties = 0,
+    this.views = 0,
+    this.likes = 0,
+    this.liked = false,
+    this.followed = false,
+    this.fullName,
+  });
 
   final String id;
   final String nick;
+  final String? fullName;
   final String? phone;
   final String? image;
   final num rank;
   final String? type;
+  final String? address;
+  final int properties;
+  final int views;
+  final int likes;
+  final bool liked;
+  final bool followed;
 
   factory Agent.fromJson(Map<String, dynamic> j) => Agent(
         id: '${j['_id']}',
@@ -198,15 +231,31 @@ class Agent {
         image: j['memberImage'] as String?,
         rank: (j['memberRank'] as num?) ?? 0,
         type: j['memberType'] as String?,
+        address: j['memberAddress'] as String?,
+        properties: (j['memberProperties'] as num?)?.toInt() ?? 0,
+        views: (j['memberViews'] as num?)?.toInt() ?? 0,
+        likes: (j['memberLikes'] as num?)?.toInt() ?? 0,
+        liked: _flag(j['meLiked'], 'myFavorite'),
+        followed: _flag(j['meFollowed'], 'myFollowing'),
+        fullName: j['memberFullName'] as String?,
       );
+
+  /// The site gives every agent card one of six color themes from its id.
+  int get variant => id.codeUnits.fold<int>(0, (a, c) => a + c) % 6;
 }
 
 /// meLiked: [{myFavorite: true}] -> true
-bool _flag(dynamic list, String key) => list is List && list.isNotEmpty && (list.first as Map)[key] == true;
+bool _flag(dynamic list, String key) =>
+    list is List && list.isNotEmpty && (list.first as Map)[key] == true;
 
 /// A review under a listing.
 class Comment {
-  Comment({required this.id, required this.content, required this.author, this.authorImage, this.createdAt});
+  Comment(
+      {required this.id,
+      required this.content,
+      required this.author,
+      this.authorImage,
+      this.createdAt});
 
   final String id;
   final String content;

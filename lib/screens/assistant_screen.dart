@@ -21,7 +21,8 @@ class AssistantScreen extends StatefulWidget {
   State<AssistantScreen> createState() => _AssistantScreenState();
 }
 
-class _AssistantScreenState extends State<AssistantScreen> with AutomaticKeepAliveClientMixin {
+class _AssistantScreenState extends State<AssistantScreen>
+    with AutomaticKeepAliveClientMixin {
   final _turns = <ChatTurn>[];
   final _input = TextEditingController();
   final _scroll = ScrollController();
@@ -76,7 +77,10 @@ class _AssistantScreenState extends State<AssistantScreen> with AutomaticKeepAli
 
   Future<void> _report(int index) async {
     final answer = _turns[index];
-    final question = _turns.take(index).lastWhere((t) => t.isUser, orElse: () => ChatTurn.user('-')).text;
+    final question = _turns
+        .take(index)
+        .lastWhere((t) => t.isUser, orElse: () => ChatTurn.user('-'))
+        .text;
     final sent = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -86,7 +90,9 @@ class _AssistantScreenState extends State<AssistantScreen> with AutomaticKeepAli
     if (sent == true && mounted) {
       setState(() => _reported.add(index));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Rahmat! Shikoyatingiz qabul qilindi, uni ko\'rib chiqamiz.')),
+        const SnackBar(
+            content: Text(
+                'Rahmat! Shikoyatingiz qabul qilindi, uni ko\'rib chiqamiz.')),
       );
     }
   }
@@ -97,12 +103,15 @@ class _AssistantScreenState extends State<AssistantScreen> with AutomaticKeepAli
     try {
       if (s.type == 'PROPERTY') {
         final bike = await Repository.instance.motorbike(s.id);
-        navigator.push(MaterialPageRoute(builder: (_) => MotorbikeDetailScreen(initial: bike)));
+        navigator.push(MaterialPageRoute(
+            builder: (_) => MotorbikeDetailScreen(initial: bike)));
       } else if (s.type == 'PART') {
         final part = await Repository.instance.part(s.id);
-        navigator.push(MaterialPageRoute(builder: (_) => PartDetailScreen(initial: part)));
+        navigator.push(
+            MaterialPageRoute(builder: (_) => PartDetailScreen(initial: part)));
       } else {
-        messenger.showSnackBar(const SnackBar(content: Text('Maqolalarni saytda o\'qishingiz mumkin.')));
+        messenger.showSnackBar(const SnackBar(
+            content: Text('Maqolalarni saytda o\'qishingiz mumkin.')));
       }
     } on ApiException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
@@ -157,8 +166,11 @@ class _AssistantScreenState extends State<AssistantScreen> with AutomaticKeepAli
                       counterText: '',
                       filled: true,
                       fillColor: scheme.surfaceContainerHighest,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide.none),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
                     ),
                   ),
                 ),
@@ -188,15 +200,18 @@ class _EmptyState extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       children: [
         const SizedBox(height: 24),
-        Icon(Icons.smart_toy_outlined, size: 56, color: theme.colorScheme.primary),
+        Icon(Icons.smart_toy_outlined,
+            size: 56, color: theme.colorScheme.primary),
         const SizedBox(height: 12),
-        Text('MOTOPRESTO AI yordamchi', textAlign: TextAlign.center, style: theme.textTheme.titleLarge),
+        Text('MOTOPRESTO AI yordamchi',
+            textAlign: TextAlign.center, style: theme.textTheme.titleLarge),
         const SizedBox(height: 8),
         Text(
           'O\'zbek, rus yoki ingliz tilida yozing — men MOTOPRESTO e\'lonlaridan mos mototsikl va qismlarni topib beraman. '
           'Javoblar sun\'iy intellekt tomonidan yaratiladi va xato bo\'lishi mumkin.',
           textAlign: TextAlign.center,
-          style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          style: theme.textTheme.bodyMedium
+              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
         const SizedBox(height: 24),
         for (final s in _suggestions)
@@ -205,7 +220,8 @@ class _EmptyState extends StatelessWidget {
             child: OutlinedButton(
               style: OutlinedButton.styleFrom(
                 alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
               onPressed: () => onPick(s),
               child: Text(s),
@@ -217,7 +233,11 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _TurnView extends StatelessWidget {
-  const _TurnView({required this.turn, required this.onSource, required this.reported, required this.onReport});
+  const _TurnView(
+      {required this.turn,
+      required this.onSource,
+      required this.reported,
+      required this.onReport});
   final ChatTurn turn;
   final ValueChanged<AiSource> onSource;
   final bool reported;
@@ -240,14 +260,17 @@ class _TurnView extends StatelessWidget {
     return Align(
       alignment: turn.isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.85),
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.85),
         child: Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: Column(
-            crossAxisAlignment: turn.isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            crossAxisAlignment:
+                turn.isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
                   color: bg,
                   borderRadius: BorderRadius.only(
@@ -257,14 +280,19 @@ class _TurnView extends StatelessWidget {
                     bottomRight: Radius.circular(turn.isUser ? 4 : 16),
                   ),
                 ),
-                child: SelectableText(turn.text, style: TextStyle(color: fg, height: 1.4)),
+                child: SelectableText(turn.text,
+                    style: TextStyle(color: fg, height: 1.4)),
               ),
               for (var n = 0; n < turn.sources.length; n++)
                 Padding(
                   padding: const EdgeInsets.only(top: 6),
-                  child: _SourceCard(index: n + 1, source: turn.sources[n], onTap: () => onSource(turn.sources[n])),
+                  child: _SourceCard(
+                      index: n + 1,
+                      source: turn.sources[n],
+                      onTap: () => onSource(turn.sources[n])),
                 ),
-              if (!turn.isUser && !turn.isError) _AnswerFooter(reported: reported, onReport: onReport),
+              if (!turn.isUser && !turn.isError)
+                _AnswerFooter(reported: reported, onReport: onReport),
             ],
           ),
         ),
@@ -282,7 +310,8 @@ class _AnswerFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final muted = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant);
+    final muted = theme.textTheme.bodySmall
+        ?.copyWith(color: theme.colorScheme.onSurfaceVariant);
     return Padding(
       padding: const EdgeInsets.only(top: 2),
       child: Wrap(
@@ -360,14 +389,16 @@ class _ReportSheetState extends State<_ReportSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + MediaQuery.viewInsetsOf(context).bottom),
+      padding: EdgeInsets.fromLTRB(
+          20, 0, 20, 20 + MediaQuery.viewInsetsOf(context).bottom),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text('AI javobi ustidan shikoyat', style: theme.textTheme.titleLarge),
           const SizedBox(height: 4),
-          Text('Bu javobda nima noto\'g\'ri?', style: theme.textTheme.bodyMedium),
+          Text('Bu javobda nima noto\'g\'ri?',
+              style: theme.textTheme.bodyMedium),
           const SizedBox(height: 8),
           RadioGroup<AiReportReason>(
             groupValue: _reason,
@@ -390,17 +421,21 @@ class _ReportSheetState extends State<_ReportSheet> {
             maxLength: 500,
             maxLines: 3,
             minLines: 1,
-            decoration: const InputDecoration(labelText: 'Izoh (ixtiyoriy)', border: OutlineInputBorder()),
+            decoration: const InputDecoration(
+                labelText: 'Izoh (ixtiyoriy)', border: OutlineInputBorder()),
           ),
           if (_error != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: Text(_error!, style: TextStyle(color: theme.colorScheme.error)),
+              child: Text(_error!,
+                  style: TextStyle(color: theme.colorScheme.error)),
             ),
           FilledButton(
             onPressed: _reason == null || _sending ? null : _submit,
             child: _sending
-                ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                ? const SizedBox.square(
+                    dimension: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2))
                 : const Text('Yuborish'),
           ),
         ],
@@ -410,7 +445,8 @@ class _ReportSheetState extends State<_ReportSheet> {
 }
 
 class _SourceCard extends StatelessWidget {
-  const _SourceCard({required this.index, required this.source, required this.onTap});
+  const _SourceCard(
+      {required this.index, required this.source, required this.onTap});
   final int index;
   final AiSource source;
   final VoidCallback onTap;
@@ -425,7 +461,10 @@ class _SourceCard extends StatelessWidget {
         onTap: onTap,
         child: Row(
           children: [
-            SizedBox(width: 72, height: 64, child: NetImage(source.image, iconSize: 24)),
+            SizedBox(
+                width: 72,
+                height: 64,
+                child: NetImage(source.image, iconSize: 24)),
             const SizedBox(width: 10),
             Expanded(
               child: Padding(
@@ -436,13 +475,15 @@ class _SourceCard extends StatelessWidget {
                     Text('[$index] ${source.title}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(fontWeight: FontWeight.w600)),
                     if (source.subtitle != null)
                       Text(
                         source.subtitle!.split(' · ').map(label).join(' · '),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant),
                       ),
                     if (source.price != null)
                       Text(formatPrice(source.price!, source.currency ?? 'USD'),
@@ -474,11 +515,16 @@ class _TypingBubble extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(color: scheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(
+            color: scheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(16)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2, color: scheme.primary)),
+            SizedBox.square(
+                dimension: 16,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: scheme.primary)),
             const SizedBox(width: 10),
             const Text('Qidiryapman…'),
           ],

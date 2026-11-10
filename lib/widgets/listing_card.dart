@@ -26,8 +26,10 @@ class CardAccent {
   final Color soft;
   final Color border;
 
-  static const green = CardAccent(Brand.green, Brand.greenDark, Color(0xFFEFF8F1), Color(0xFFCDEBD5));
-  static const indigo = CardAccent(Brand.indigo, Brand.indigoDark, Color(0xFFF1F1FD), Color(0xFFDADAF8));
+  static const green = CardAccent(
+      Brand.green, Brand.greenDark, Color(0xFFEFF8F1), Color(0xFFCDEBD5));
+  static const indigo = CardAccent(
+      Brand.indigo, Brand.indigoDark, Color(0xFFF1F1FD), Color(0xFFDADAF8));
 }
 
 /// The website's listing card: photo with view/like pills, title + "BRAND · YEAR"
@@ -66,6 +68,7 @@ class ListingCard extends StatelessWidget {
 
   /// Top-left label on the photo, e.g. "SPORT".
   final String? badge;
+
   /// Already formatted, e.g. "20.00" on home or "1.2" in lists (as on the site).
   final String? rating;
   final List<CardChip> chips;
@@ -100,11 +103,23 @@ class ListingCard extends StatelessWidget {
                 children: [
                   Hero(tag: heroTag, child: NetImage(image)),
                   if (badge != null && badge!.isNotEmpty)
-                    Positioned(left: 12, top: 12, child: _PhotoPill(text: badge!.toUpperCase(), light: true)),
+                    Positioned(
+                        left: 12,
+                        top: 12,
+                        child: _PhotoPill(
+                            text: badge!.toUpperCase(), light: true)),
                   if (views != null)
-                    Positioned(left: 12, bottom: 12, child: _PhotoPill(icon: Icons.visibility, text: '$views')),
+                    Positioned(
+                        left: 12,
+                        bottom: 12,
+                        child:
+                            _PhotoPill(icon: Icons.visibility, text: '$views')),
                   if (likes != null)
-                    Positioned(right: 12, bottom: 12, child: _PhotoPill(icon: Icons.favorite, text: '$likes', soft: true)),
+                    Positioned(
+                        right: 12,
+                        bottom: 12,
+                        child: _PhotoPill(
+                            icon: Icons.favorite, text: '$likes', soft: true)),
                 ],
               ),
             ),
@@ -123,7 +138,10 @@ class ListingCard extends StatelessWidget {
                               title,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Brand.ink),
+                              style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w800,
+                                  color: Brand.ink),
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -131,7 +149,10 @@ class ListingCard extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                  fontSize: 12.5, color: Brand.muted, fontWeight: FontWeight.w600, letterSpacing: 0.4),
+                                  fontSize: 12.5,
+                                  color: Brand.muted,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.4),
                             ),
                           ],
                         ),
@@ -139,20 +160,29 @@ class ListingCard extends StatelessWidget {
                       if (rating != null) ...[
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 11, vertical: 6),
                           decoration: BoxDecoration(
                             color: accent.soft,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: accent.border),
-                            boxShadow: [BoxShadow(color: accent.main.withValues(alpha: 0.12), blurRadius: 10)],
+                            boxShadow: [
+                              BoxShadow(
+                                  color: accent.main.withValues(alpha: 0.12),
+                                  blurRadius: 10)
+                            ],
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.star_rounded, size: 17, color: Color(0xFFFFC107)),
+                              const Icon(Icons.star_rounded,
+                                  size: 17, color: Color(0xFFFFC107)),
                               const SizedBox(width: 5),
                               Text(rating!,
-                                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: accent.main)),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 14,
+                                      color: accent.main)),
                             ],
                           ),
                         ),
@@ -161,14 +191,20 @@ class ListingCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 14),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-                    decoration: BoxDecoration(color: accent.soft, borderRadius: BorderRadius.circular(10)),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                    decoration: BoxDecoration(
+                        color: accent.soft,
+                        borderRadius: BorderRadius.circular(10)),
                     child: Row(
                       children: [
                         Icon(Icons.place, size: 17, color: accent.main),
                         const SizedBox(width: 10),
                         Text(location,
-                            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF374151))),
+                            style: const TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF374151))),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -176,7 +212,8 @@ class ListingCard extends StatelessWidget {
                             textAlign: TextAlign.right,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 11.5, color: Brand.muted),
+                            style: const TextStyle(
+                                fontSize: 11.5, color: Brand.muted),
                           ),
                         ),
                       ],
@@ -198,21 +235,38 @@ class ListingCard extends StatelessWidget {
                     child: Divider(height: 1, color: Color(0xFFEAEAEA)),
                   ),
                   Text(priceLabel,
-                      style: const TextStyle(fontSize: 10.5, color: Color(0xFF9CA3AF), fontWeight: FontWeight.w700, letterSpacing: 0.8)),
-                  Text(price, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: accent.main, height: 1.2)),
+                      style: const TextStyle(
+                          fontSize: 10.5,
+                          color: Color(0xFF9CA3AF),
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8)),
+                  Text(price,
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: accent.main,
+                          height: 1.2)),
                   const SizedBox(height: 10),
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [accent.main, accent.dark]),
+                      gradient:
+                          LinearGradient(colors: [accent.main, accent.dark]),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
-                        BoxShadow(color: accent.main.withValues(alpha: 0.32), blurRadius: 16, offset: const Offset(0, 7)),
+                        BoxShadow(
+                            color: accent.main.withValues(alpha: 0.32),
+                            blurRadius: 16,
+                            offset: const Offset(0, 7)),
                       ],
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 11),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 26, vertical: 11),
                       child: Text(action,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15)),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 15)),
                     ),
                   ),
                 ],
@@ -226,7 +280,8 @@ class ListingCard extends StatelessWidget {
 }
 
 class _PhotoPill extends StatelessWidget {
-  const _PhotoPill({this.icon, required this.text, this.light = false, this.soft = false});
+  const _PhotoPill(
+      {this.icon, required this.text, this.light = false, this.soft = false});
   final IconData? icon;
   final String text;
   final bool light;
@@ -244,12 +299,21 @@ class _PhotoPill extends StatelessWidget {
             : const Color(0xFF181A20).withValues(alpha: 0.75);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: light ? 12 : 11, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(light ? 8 : 14)),
+      decoration: BoxDecoration(
+          color: bg, borderRadius: BorderRadius.circular(light ? 8 : 14)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) ...[Icon(icon, size: 15, color: fg), const SizedBox(width: 6)],
-          Text(text, style: TextStyle(color: fg, fontSize: 12.5, fontWeight: FontWeight.w700, letterSpacing: 0.4)),
+          if (icon != null) ...[
+            Icon(icon, size: 15, color: fg),
+            const SizedBox(width: 6)
+          ],
+          Text(text,
+              style: TextStyle(
+                  color: fg,
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.4)),
         ],
       ),
     );
@@ -265,7 +329,8 @@ class _SpecPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      decoration: BoxDecoration(color: accent.soft, borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+          color: accent.soft, borderRadius: BorderRadius.circular(10)),
       child: Row(
         children: [
           Icon(chip.icon, size: 14, color: accent.main),
@@ -275,7 +340,8 @@ class _SpecPill extends StatelessWidget {
               chip.text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Brand.ink),
+              style: const TextStyle(
+                  fontSize: 12, fontWeight: FontWeight.w700, color: Brand.ink),
             ),
           ),
         ],

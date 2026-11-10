@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'api/auth_service.dart';
 import 'config.dart';
+import 'screens/agents_screen.dart';
 import 'screens/assistant_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/motorbikes_screen.dart';
@@ -33,7 +34,7 @@ class MotoprestoApp extends StatelessWidget {
 }
 
 /// Pages reachable from the drawer, same order as the website menu.
-enum AppPage { home, bikes, parts, assistant, profile }
+enum AppPage { home, bikes, parts, agents, assistant, profile }
 
 /// Website layout: dark navbar (logo · Kirish · ☰), drawer menu,
 /// floating "AI Assistant" button bottom-left.
@@ -111,6 +112,7 @@ class _HomeShellState extends State<HomeShell> {
                   category: _partsCategory,
                   onCategoryChanged: (c) => _partsCategory = c,
                 ),
+                const AgentsScreen(),
                 const AssistantScreen(),
                 const ProfileScreen(),
               ],
@@ -257,6 +259,8 @@ class _MenuDrawer extends StatelessWidget {
                 'Aksessuarlar',
                 page == AppPage.parts && partsCategory == 'ACCESSORY',
                 () => onGo(AppPage.parts, category: 'ACCESSORY')),
+            item('Agentlar', page == AppPage.agents,
+                () => onGo(AppPage.agents)),
             item('AI yordamchi', page == AppPage.assistant,
                 () => onGo(AppPage.assistant)),
             item(loggedIn ? 'Mening sahifam' : 'Kirish / Ro\'yxatdan o\'tish',

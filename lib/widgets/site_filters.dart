@@ -17,7 +17,8 @@ ButtonStyle _outlined({double height = 40}) => OutlinedButton.styleFrom(
       minimumSize: Size(0, height),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      textStyle: const TextStyle(fontFamily: 'Poppins', fontSize: 13.5, fontWeight: FontWeight.w500),
+      textStyle: const TextStyle(
+          fontFamily: 'Poppins', fontSize: 13.5, fontWeight: FontWeight.w500),
     );
 
 /// Anchor a menu under [context]'s widget.
@@ -31,15 +32,19 @@ Future<T?> _menu<T>(BuildContext context, List<PopupMenuEntry<T>> items) {
   return showMenu<T>(
     context: context,
     position: RelativeRect.fromRect(rect, Offset.zero & overlay.size),
-    constraints: const BoxConstraints(minWidth: 200, maxWidth: 240, maxHeight: 360),
+    constraints:
+        const BoxConstraints(minWidth: 200, maxWidth: 240, maxHeight: 360),
     color: Colors.white,
     surfaceTintColor: Colors.transparent,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: const BorderSide(color: Color(0xFFE5E5E5))),
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: const BorderSide(color: Color(0xFFE5E5E5))),
     items: items,
   );
 }
 
-PopupMenuItem<T> _item<T>(T value, String label, {bool selected = false}) => PopupMenuItem<T>(
+PopupMenuItem<T> _item<T>(T value, String label, {bool selected = false}) =>
+    PopupMenuItem<T>(
       value: value,
       height: 42,
       child: Row(
@@ -59,7 +64,11 @@ PopupMenuItem<T> _item<T>(T value, String label, {bool selected = false}) => Pop
 PopupMenuEntry<T> _heading<T>(String text) => PopupMenuItem<T>(
       enabled: false,
       height: 34,
-      child: Text(text, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF6B7280))),
+      child: Text(text,
+          style: const TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF6B7280))),
     );
 
 /// Full-width "Yangi ⌄" sort button.
@@ -77,14 +86,17 @@ class SortButton extends StatelessWidget {
           style: _outlined(height: 36),
           onPressed: () async {
             final picked = await _menu<SortOption>(context, [
-              for (final o in SortOption.values) _item(o, o.label, selected: o == sort),
+              for (final o in SortOption.values)
+                _item(o, o.label, selected: o == sort),
             ]);
             if (picked != null) onChanged(picked);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(sort?.label ?? 'Yangi', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+              Text(sort?.label ?? 'Yangi',
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w500)),
               const SizedBox(width: 10),
               const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
             ],
@@ -116,11 +128,13 @@ class MultiFilterButton extends StatelessWidget {
     return Builder(
       builder: (context) => OutlinedButton(
         style: _outlined().copyWith(
-          side: WidgetStatePropertyAll(BorderSide(color: count > 0 ? Brand.green : _border)),
+          side: WidgetStatePropertyAll(
+              BorderSide(color: count > 0 ? Brand.green : _border)),
         ),
         onPressed: () async {
           final picked = await _menu<String>(context, [
-            for (final o in options) _item(o, labelOf(o), selected: selected.contains(o)),
+            for (final o in options)
+              _item(o, labelOf(o), selected: selected.contains(o)),
           ]);
           if (picked != null) onToggle(picked);
         },
@@ -171,15 +185,18 @@ class RangeFilterButton extends StatelessWidget {
     return Builder(
       builder: (context) => OutlinedButton(
         style: _outlined().copyWith(
-          side: WidgetStatePropertyAll(BorderSide(color: active ? Brand.green : _border)),
+          side: WidgetStatePropertyAll(
+              BorderSide(color: active ? Brand.green : _border)),
         ),
         onPressed: () async {
           final picked = await _menu<(bool, int)>(context, [
             _heading(fromTitle),
-            for (final v in fromOptions) _item((true, v), format(v), selected: v == from),
+            for (final v in fromOptions)
+              _item((true, v), format(v), selected: v == from),
             const PopupMenuDivider(),
             _heading(toTitle),
-            for (final v in toOptions) _item((false, v), format(v), selected: v == to),
+            for (final v in toOptions)
+              _item((false, v), format(v), selected: v == to),
           ]);
           if (picked == null) return;
           var (isFrom, v) = picked;
@@ -221,9 +238,32 @@ class ResetFilterButton extends StatelessWidget {
 }
 
 /// Price options of the site's price menu.
-const minPriceOptions = [0, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000];
-const maxPriceOptions = [500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000];
+const minPriceOptions = [
+  0,
+  500,
+  1000,
+  2000,
+  5000,
+  10000,
+  20000,
+  50000,
+  100000,
+  200000
+];
+const maxPriceOptions = [
+  500,
+  1000,
+  2000,
+  5000,
+  10000,
+  20000,
+  50000,
+  100000,
+  200000,
+  500000
+];
 String usd(int v) => formatPrice(v, 'USD');
 
 /// Years in the site's year menu (newest first).
-List<int> yearOptions() => [for (var y = DateTime.now().year; y >= 2000; y--) y];
+List<int> yearOptions() =>
+    [for (var y = DateTime.now().year; y >= 2000; y--) y];

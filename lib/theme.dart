@@ -36,7 +36,8 @@ class Brand {
       surface: Colors.white,
       brightness: Brightness.light,
     );
-    final base = ThemeData(colorScheme: scheme, useMaterial3: true, fontFamily: 'Poppins');
+    final base = ThemeData(
+        colorScheme: scheme, useMaterial3: true, fontFamily: 'Poppins');
     return base.copyWith(
       scaffoldBackgroundColor: page,
       appBarTheme: const AppBarTheme(
@@ -45,7 +46,11 @@ class Brand {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        titleTextStyle: TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
+        titleTextStyle: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Colors.white),
       ),
       cardTheme: CardThemeData(
         elevation: 0,
@@ -60,28 +65,37 @@ class Brand {
         style: FilledButton.styleFrom(
           backgroundColor: green,
           foregroundColor: Colors.white,
-          textStyle: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w700, fontSize: 15),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          textStyle: const TextStyle(
+              fontFamily: 'Poppins', fontWeight: FontWeight.w700, fontSize: 15),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: green,
           side: const BorderSide(color: green, width: 1.5),
-          textStyle: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w700, fontSize: 15),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          textStyle: const TextStyle(
+              fontFamily: 'Poppins', fontWeight: FontWeight.w700, fontSize: 15),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: line)),
-        enabledBorder:
-            OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: line)),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: line)),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: line)),
         focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: green, width: 1.5)),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: green, width: 1.5)),
       ),
-      snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating, backgroundColor: ink),
+      snackBarTheme: const SnackBarThemeData(
+          behavior: SnackBarBehavior.floating, backgroundColor: ink),
       drawerTheme: const DrawerThemeData(backgroundColor: ink),
     );
   }
@@ -94,5 +108,6 @@ class BrandLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Image.asset('assets/brand/logo_white.png', height: height, fit: BoxFit.contain, semanticLabel: 'MOTOPRESTO');
+      Image.asset('assets/brand/logo_white.png',
+          height: height, fit: BoxFit.contain, semanticLabel: 'MOTOPRESTO');
 }

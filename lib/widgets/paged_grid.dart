@@ -97,16 +97,19 @@ class _PagedGridState<T> extends State<PagedGrid<T>> {
   Widget build(BuildContext context) {
     final Widget body;
     if (_items.isEmpty && _loading) {
-      body = const SliverFillRemaining(hasScrollBody: false, child: LoadingView());
+      body =
+          const SliverFillRemaining(hasScrollBody: false, child: LoadingView());
     } else if (_items.isEmpty && _error != null) {
       body = SliverFillRemaining(
         hasScrollBody: false,
-        child: MessageView(icon: Icons.cloud_off, message: _error!, onRetry: _refresh),
+        child: MessageView(
+            icon: Icons.cloud_off, message: _error!, onRetry: _refresh),
       );
     } else if (_items.isEmpty) {
       body = SliverFillRemaining(
         hasScrollBody: false,
-        child: MessageView(icon: Icons.search_off, message: widget.emptyMessage),
+        child:
+            MessageView(icon: Icons.search_off, message: widget.emptyMessage),
       );
     } else {
       body = SliverPadding(
@@ -132,7 +135,9 @@ class _PagedGridState<T> extends State<PagedGrid<T>> {
         slivers: [
           if (widget.top != null) SliverToBoxAdapter(child: widget.top),
           if (widget.title != null)
-            SliverToBoxAdapter(child: _HeaderCard(title: widget.title!, total: _total, child: widget.header))
+            SliverToBoxAdapter(
+                child: _HeaderCard(
+                    title: widget.title!, total: _total, child: widget.header))
           else if (widget.header != null)
             SliverToBoxAdapter(child: widget.header),
           body,
@@ -143,7 +148,9 @@ class _PagedGridState<T> extends State<PagedGrid<T>> {
                 child: Center(
                   child: _loading
                       ? const CircularProgressIndicator()
-                      : TextButton(onPressed: _loadMore, child: const Text('Yana yuklash')),
+                      : TextButton(
+                          onPressed: _loadMore,
+                          child: const Text('Yana yuklash')),
                 ),
               ),
             ),
@@ -176,9 +183,18 @@ class _HeaderCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w700, color: Brand.ink, height: 1.3)),
+            Text(title,
+                style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w700,
+                    color: Brand.ink,
+                    height: 1.3)),
             const SizedBox(height: 6),
-            Text('$total mavjud', style: const TextStyle(fontSize: 13.5, color: Color(0xFF717171), fontWeight: FontWeight.w300)),
+            Text('$total mavjud',
+                style: const TextStyle(
+                    fontSize: 13.5,
+                    color: Color(0xFF717171),
+                    fontWeight: FontWeight.w300)),
             if (child != null) child!,
           ],
         ),

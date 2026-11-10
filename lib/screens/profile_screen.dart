@@ -16,7 +16,9 @@ class ProfileScreen extends StatelessWidget {
       listenable: AuthService.instance,
       builder: (context, _) {
         final member = AuthService.instance.member;
-        return member == null ? const _AuthForm() : _ProfileView(member: member);
+        return member == null
+            ? const _AuthForm()
+            : _ProfileView(member: member);
       },
     );
   }
@@ -33,8 +35,12 @@ class _ProfileView extends StatelessWidget {
         title: const Text('Chiqish'),
         content: const Text('Hisobingizdan chiqmoqchimisiz?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Bekor qilish')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Chiqish')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Bekor qilish')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Chiqish')),
         ],
       ),
     );
@@ -45,16 +51,20 @@ class _ProfileView extends StatelessWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error),
+        icon: Icon(Icons.warning_amber_rounded,
+            color: Theme.of(context).colorScheme.error),
         title: const Text('Hisobni o\'chirish'),
         content: const Text(
           'Hisobingiz butunlay o\'chiriladi: barcha qurilmalardagi sessiyalar yopiladi, '
           'e\'lonlaringiz va maqolalaringiz saytdan olib tashlanadi. Buni qaytarib bo\'lmaydi.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Bekor qilish')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Bekor qilish')),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('O\'chirish'),
           ),
@@ -65,7 +75,8 @@ class _ProfileView extends StatelessWidget {
     final messenger = ScaffoldMessenger.of(context);
     try {
       await AuthService.instance.deleteAccount();
-      messenger.showSnackBar(const SnackBar(content: Text('Hisobingiz o\'chirildi')));
+      messenger.showSnackBar(
+          const SnackBar(content: Text('Hisobingiz o\'chirildi')));
     } on ApiException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     }
@@ -81,25 +92,36 @@ class _ProfileView extends StatelessWidget {
         const SizedBox(height: 16),
         Center(
           child: ClipOval(
-            child: SizedBox.square(dimension: 96, child: NetImage(member.image, iconSize: 40)),
+            child: SizedBox.square(
+                dimension: 96, child: NetImage(member.image, iconSize: 40)),
           ),
         ),
         const SizedBox(height: 16),
-        Text(member.nick, textAlign: TextAlign.center, style: theme.textTheme.headlineSmall),
+        Text(member.nick,
+            textAlign: TextAlign.center, style: theme.textTheme.headlineSmall),
         const SizedBox(height: 4),
-        Center(child: Tag(member.isAgent ? 'Diler' : 'Foydalanuvchi', highlight: true)),
+        Center(
+            child: Tag(member.isAgent ? 'Diler' : 'Foydalanuvchi',
+                highlight: true)),
         const SizedBox(height: 24),
         Card(
           margin: EdgeInsets.zero,
           child: Column(
             children: [
               if (member.fullName?.isNotEmpty == true)
-                ListTile(leading: const Icon(Icons.person_outline), title: Text(member.fullName!), subtitle: const Text('Ism')),
+                ListTile(
+                    leading: const Icon(Icons.person_outline),
+                    title: Text(member.fullName!),
+                    subtitle: const Text('Ism')),
               if (member.phone?.isNotEmpty == true)
-                ListTile(leading: const Icon(Icons.phone_outlined), title: Text(member.phone!), subtitle: const Text('Telefon')),
+                ListTile(
+                    leading: const Icon(Icons.phone_outlined),
+                    title: Text(member.phone!),
+                    subtitle: const Text('Telefon')),
               const ListTile(
                 leading: Icon(Icons.info_outline),
-                title: Text('E\'lon joylash va profilni tahrirlash hozircha saytda'),
+                title: Text(
+                    'E\'lon joylash va profilni tahrirlash hozircha saytda'),
               ),
             ],
           ),
@@ -185,14 +207,19 @@ class _AuthFormState extends State<_AuthForm> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        Icon(Icons.account_circle_outlined, size: 64, color: theme.colorScheme.primary),
+        Icon(Icons.account_circle_outlined,
+            size: 64, color: theme.colorScheme.primary),
         const SizedBox(height: 8),
-        Text(_signup ? 'Ro\'yxatdan o\'tish' : 'Kirish', textAlign: TextAlign.center, style: theme.textTheme.headlineSmall),
+        Text(_signup ? 'Ro\'yxatdan o\'tish' : 'Kirish',
+            textAlign: TextAlign.center, style: theme.textTheme.headlineSmall),
         const SizedBox(height: 4),
         Text(
-          _signup ? 'Hisob saytda ham, ilovada ham ishlaydi' : 'Saytdagi hisobingiz bilan kiring',
+          _signup
+              ? 'Hisob saytda ham, ilovada ham ishlaydi'
+              : 'Saytdagi hisobingiz bilan kiring',
           textAlign: TextAlign.center,
-          style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          style: theme.textTheme.bodyMedium
+              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
         const SizedBox(height: 24),
         SegmentedButton<bool>(
@@ -226,7 +253,9 @@ class _AuthFormState extends State<_AuthForm> {
                   ),
                   validator: (v) {
                     final t = v?.trim() ?? '';
-                    if (t.length < 3 || t.length > 20) return '3–20 ta belgi bo\'lishi kerak';
+                    if (t.length < 3 || t.length > 20) {
+                      return '3–20 ta belgi bo\'lishi kerak';
+                    }
                     return null;
                   },
                 ),
@@ -235,21 +264,29 @@ class _AuthFormState extends State<_AuthForm> {
                   controller: _password,
                   enabled: !_busy,
                   obscureText: !_showPassword,
-                  autofillHints: [_signup ? AutofillHints.newPassword : AutofillHints.password],
-                  textInputAction: _signup ? TextInputAction.next : TextInputAction.done,
+                  autofillHints: [
+                    _signup ? AutofillHints.newPassword : AutofillHints.password
+                  ],
+                  textInputAction:
+                      _signup ? TextInputAction.next : TextInputAction.done,
                   onFieldSubmitted: (_) => _signup ? null : _submit(),
                   decoration: InputDecoration(
                     labelText: 'Parol',
                     prefixIcon: const Icon(Icons.lock_outline),
                     border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
-                      icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
-                      onPressed: () => setState(() => _showPassword = !_showPassword),
+                      icon: Icon(_showPassword
+                          ? Icons.visibility_off
+                          : Icons.visibility),
+                      onPressed: () =>
+                          setState(() => _showPassword = !_showPassword),
                     ),
                   ),
                   validator: (v) {
                     final t = v ?? '';
-                    if (t.length < 5 || t.length > 30) return '5–30 ta belgi bo\'lishi kerak';
+                    if (t.length < 5 || t.length > 30) {
+                      return '5–30 ta belgi bo\'lishi kerak';
+                    }
                     return null;
                   },
                 ),
@@ -269,7 +306,9 @@ class _AuthFormState extends State<_AuthForm> {
                     ),
                     validator: (v) {
                       final t = v?.trim() ?? '';
-                      if (t.length < 7 || t.length > 20) return 'Telefon raqamni to\'g\'ri kiriting';
+                      if (t.length < 7 || t.length > 20) {
+                        return 'Telefon raqamni to\'g\'ri kiriting';
+                      }
                       return null;
                     },
                   ),
@@ -277,9 +316,11 @@ class _AuthFormState extends State<_AuthForm> {
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
                     title: const Text('Men dilerman'),
-                    subtitle: const Text('Mototsikl va qismlar sotuvchi do\'kon yoki agent'),
+                    subtitle: const Text(
+                        'Mototsikl va qismlar sotuvchi do\'kon yoki agent'),
                     value: _isAgent,
-                    onChanged: _busy ? null : (v) => setState(() => _isAgent = v),
+                    onChanged:
+                        _busy ? null : (v) => setState(() => _isAgent = v),
                   ),
                 ],
               ],
@@ -288,14 +329,18 @@ class _AuthFormState extends State<_AuthForm> {
         ),
         if (_error != null) ...[
           const SizedBox(height: 12),
-          Text(_error!, textAlign: TextAlign.center, style: TextStyle(color: theme.colorScheme.error)),
+          Text(_error!,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: theme.colorScheme.error)),
         ],
         const SizedBox(height: 20),
         FilledButton(
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
           onPressed: _busy ? null : _submit,
           child: _busy
-              ? const SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2.5))
+              ? const SizedBox.square(
+                  dimension: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2.5))
               : Text(_signup ? 'Ro\'yxatdan o\'tish' : 'Kirish'),
         ),
         const SizedBox(height: 12),
@@ -311,7 +356,8 @@ class _PrivacyLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: () => launchUrl(Uri.parse(privacyUrl), mode: LaunchMode.externalApplication),
+      onPressed: () => launchUrl(Uri.parse(privacyUrl),
+          mode: LaunchMode.externalApplication),
       child: const Text('Maxfiylik siyosati'),
     );
   }

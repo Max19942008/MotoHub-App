@@ -33,7 +33,8 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
 
   Future<List<Widget>> _loadSimilar() async {
     try {
-      final list = await Repository.instance.similarParts(widget.initial.category);
+      final list =
+          await Repository.instance.similarParts(widget.initial.category);
       return [
         for (final p in list.where((p) => p.id != widget.initial.id))
           SimilarCard(
@@ -49,8 +50,10 @@ class _PartDetailScreenState extends State<PartDetailScreen> {
             views: p.views,
             likes: p.likes,
             barter: p.barter,
-            onTap: () =>
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => PartDetailScreen(initial: p))),
+            onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => PartDetailScreen(initial: p))),
           ),
       ];
     } catch (_) {
