@@ -38,6 +38,8 @@ class Motorbike {
     required this.views,
     required this.likes,
     this.rank = 0,
+    this.liked = false,
+    this.interested = false,
     required this.images,
     required this.barter,
     required this.rent,
@@ -61,6 +63,9 @@ class Motorbike {
   final int views;
   final int likes;
   final num rank;
+  /// Set only on the detail query, for the logged-in member.
+  final bool liked;
+  final bool interested;
   final List<String> images;
   final bool barter;
   final bool rent;
@@ -84,6 +89,8 @@ class Motorbike {
         views: (j['propertyViews'] as num?)?.toInt() ?? 0,
         likes: (j['propertyLikes'] as num?)?.toInt() ?? 0,
         rank: (j['propertyRank'] as num?) ?? 0,
+        liked: _flag(j['meLiked'], 'myFavorite'),
+        interested: _flag(j['meInterested'], 'myInterest'),
         images: ((j['propertyImages'] as List?) ?? const []).map((e) => '$e').toList(),
         barter: j['propertyBarter'] == true,
         rent: j['propertyRent'] == true,
@@ -110,6 +117,8 @@ class Part {
     required this.views,
     required this.likes,
     this.rank = 0,
+    this.liked = false,
+    this.interested = false,
     required this.images,
     required this.barter,
     this.description,
@@ -131,6 +140,9 @@ class Part {
   final int views;
   final int likes;
   final num rank;
+  /// Set only on the detail query, for the logged-in member.
+  final bool liked;
+  final bool interested;
   final List<String> images;
   final bool barter;
   final String? description;
@@ -152,6 +164,8 @@ class Part {
         views: (j['partViews'] as num?)?.toInt() ?? 0,
         likes: (j['partLikes'] as num?)?.toInt() ?? 0,
         rank: (j['partRank'] as num?) ?? 0,
+        liked: _flag(j['meLiked'], 'myFavorite'),
+        interested: _flag(j['meInterested'], 'myInterest'),
         images: ((j['partImages'] as List?) ?? const []).map((e) => '$e').toList(),
         barter: j['partBarter'] == true,
         description: j['partDesc'] as String?,
@@ -185,4 +199,29 @@ class Agent {
         rank: (j['memberRank'] as num?) ?? 0,
         type: j['memberType'] as String?,
       );
+}
+
+/// meLiked: [{myFavorite: true}] -> true
+bool _flag(dynamic list, String key) => list is List && list.isNotEmpty && (list.first as Map)[key] == true;
+
+/// A review under a listing.
+class Comment {
+  Comment({required this.id, required this.content, required this.author, this.authorImage, this.createdAt});
+
+  final String id;
+  final String content;
+  final String author;
+  final String? authorImage;
+  final DateTime? createdAt;
+
+  factory Comment.fromJson(Map<String, dynamic> j) {
+    final member = j['memberData'] as Map<String, dynamic>?;
+    return Comment(
+      id: '${j['_id']}',
+      content: '${j['commentContent'] ?? ''}',
+      author: '${member?['memberNick'] ?? ''}',
+      authorImage: member?['memberImage'] as String?,
+      createdAt: DateTime.tryParse('${j['createdAt'] ?? ''}'),
+    );
+  }
 }

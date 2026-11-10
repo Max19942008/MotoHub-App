@@ -14,6 +14,8 @@ const _motorbikeFields = '''
   $_sellerFields
 ''';
 
+const _meFields = 'meLiked { myFavorite } meInterested { myInterest }';
+
 const _partFields = '''
   _id partCategory partType partLocation partBrand partCondition partTitle
   partPrice partCurrency partStockCount partCompatibleBrands partViews partLikes partRank
@@ -251,7 +253,7 @@ class Repository {
 
   Future<Motorbike> motorbike(String id) async {
     final data = await _gql.query('''
-      query (\$id: String!) { getProperty(propertyId: \$id) { $_motorbikeFields } }
+      query (\$id: String!) { getProperty(propertyId: \$id) { $_motorbikeFields $_meFields } }
     ''', variables: {'id': id});
     return Motorbike.fromJson(data['getProperty'] as Map<String, dynamic>);
   }
@@ -282,9 +284,92 @@ class Repository {
 
   Future<Part> part(String id) async {
     final data = await _gql.query('''
-      query (\$id: String!) { getPart(partId: \$id) { $_partFields } }
+      query (\$id: String!) { getPart(partId: \$id) { $_partFields $_meFields } }
     ''', variables: {'id': id});
     return Part.fromJson(data['getPart'] as Map<String, dynamic>);
+  }
+
+  // ---- detail page actions (need a logged-in member) ----
+
+  Future<void> likeMotorbike(String id) =>
+      _gql.query(r'mutation ($id: String!) { likeTargetProperty(propertyId: $id) { _id } }', variables: {'id': id});
+
+  Future<void> likePart(String id) =>
+      _gql.query(r'mutation ($id: String!) { likeTargetPart(partId: $id) { _id } }', variables: {'id': id});
+
+  /// Tells the dealer "I'm interested" (one-way, like the site).
+  Future<void> notifyInterest(String id) =>
+      _gql.query(r'mutation ($id: String!) { notifyInterest(propertyId: $id) }', variables: {'id': id});
+
+  Future<void> notifyPartInterest(String id) =>
+      _gql.query(r'mutation ($id: String!) { notifyPartInterest(partId: $id) }', variables: {'id': id});
+
+  Future<PageResult<Comment>> comments(String refId, int page) async {
+    final data = await _gql.query(r'''
+      query ($input: CommentsInquiry!) {
+        getComments(input: $input) {
+          list { _id commentContent createdAt memberData { memberNick memberImage } }
+          metaCounter { total }
+        }
+      }
+    ''', variables: {
+      'input': {
+        'page': page,
+        'limit': 5,
+        'sort': 'createdAt',
+        'direction': 'DESC',
+        'search': {'commentRefId': refId},
+      },
+    });
+    final result = data['getComments'] as Map<String, dynamic>;
+    return PageResult(
+      (result['list'] as List).map((e) => Comment.fromJson(e as Map<String, dynamic>)).toList(),
+      _total(result),
+    );
+  }
+
+  /// [group] is PROPERTY or PART.
+  Future<void> addComment(String group, String refId, String content) => _gql.query(
+        r'mutation ($input: CommentInput!) { createComment(input: $input) { _id } }',
+        variables: {
+          'input': {'commentGroup': group, 'commentRefId': refId, 'commentContent': content},
+        },
+      );
+
+  /// "Related bikes": newest in the same region (site query).
+  Future<List<Motorbike>> similarMotorbikes(String location) async {
+    final data = await _gql.query('''
+      query (\$input: PropertiesInquiry!) { getProperties(input: \$input) { list { $_motorbikeFields } } }
+    ''', variables: {
+      'input': {
+        'page': 1,
+        'limit': 9,
+        'sort': 'createdAt',
+        'direction': 'DESC',
+        'search': {'locationList': [location]},
+      },
+    });
+    return ((data['getProperties'] as Map<String, dynamic>)['list'] as List)
+        .map((e) => Motorbike.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// "Related parts": newest in the same category (site query).
+  Future<List<Part>> similarParts(String category) async {
+    final data = await _gql.query('''
+      query (\$input: PartsInquiry!) { getParts(input: \$input) { list { $_partFields } } }
+    ''', variables: {
+      'input': {
+        'page': 1,
+        'limit': 9,
+        'sort': 'createdAt',
+        'direction': 'DESC',
+        'search': {'categoryList': [category]},
+      },
+    });
+    return ((data['getParts'] as Map<String, dynamic>)['list'] as List)
+        .map((e) => Part.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   int _total(Map<String, dynamic> result) {
