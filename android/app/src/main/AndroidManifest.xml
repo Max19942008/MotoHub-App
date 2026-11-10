@@ -2,7 +2,7 @@
     <!-- Release builds need this explicitly; Flutter only adds it to debug/profile. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="MotoHub"
+        android:label="MOTOPRESTO"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

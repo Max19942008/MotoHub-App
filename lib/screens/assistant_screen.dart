@@ -190,10 +190,10 @@ class _EmptyState extends StatelessWidget {
         const SizedBox(height: 24),
         Icon(Icons.smart_toy_outlined, size: 56, color: theme.colorScheme.primary),
         const SizedBox(height: 12),
-        Text('MotoHub AI yordamchi', textAlign: TextAlign.center, style: theme.textTheme.titleLarge),
+        Text('MOTOPRESTO AI yordamchi', textAlign: TextAlign.center, style: theme.textTheme.titleLarge),
         const SizedBox(height: 8),
         Text(
-          'O\'zbek, rus yoki ingliz tilida yozing — men MotoHub e\'lonlaridan mos mototsikl va qismlarni topib beraman. '
+          'O\'zbek, rus yoki ingliz tilida yozing — men MOTOPRESTO e\'lonlaridan mos mototsikl va qismlarni topib beraman. '
           'Javoblar sun\'iy intellekt tomonidan yaratiladi va xato bo\'lishi mumkin.',
           textAlign: TextAlign.center,
           style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),

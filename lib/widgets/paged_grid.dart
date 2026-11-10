@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../api/graphql_client.dart';
 import '../models/listing.dart';
+import '../theme.dart';
 import 'common.dart';
 
 typedef PageFetcher<T> = Future<PageResult<T>> Function(int page);
 
-/// Two-column grid with infinite scroll and pull-to-refresh.
+/// Website-style list: a white header card (title, "N mavjud", search) on top,
+/// then one big card per row, with infinite scroll and pull-to-refresh.
 /// Give it a new [key] when the filter changes to start over from page 1.
 class PagedGrid<T> extends StatefulWidget {
   const PagedGrid({
@@ -14,12 +16,16 @@ class PagedGrid<T> extends StatefulWidget {
     required this.fetch,
     required this.itemBuilder,
     this.header,
+    this.title,
     this.emptyMessage = 'Hech narsa topilmadi',
   });
 
   final PageFetcher<T> fetch;
   final Widget Function(BuildContext context, T item) itemBuilder;
   final Widget? header;
+
+  /// Big page title in the header card, e.g. "Mototsikllar".
+  final String? title;
   final String emptyMessage;
 
   @override
@@ -100,16 +106,16 @@ class _PagedGridState<T> extends State<PagedGrid<T>> {
       );
     } else {
       body = SliverPadding(
-        padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-        sliver: SliverGrid.builder(
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 260,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 0.66,
-          ),
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+        sliver: SliverList.separated(
           itemCount: _items.length,
-          itemBuilder: (context, i) => widget.itemBuilder(context, _items[i]),
+          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          itemBuilder: (context, i) => Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: widget.itemBuilder(context, _items[i]),
+            ),
+          ),
         ),
       );
     }
@@ -120,7 +126,10 @@ class _PagedGridState<T> extends State<PagedGrid<T>> {
         controller: _scroll,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          if (widget.header != null) SliverToBoxAdapter(child: widget.header),
+          if (widget.title != null)
+            SliverToBoxAdapter(child: _HeaderCard(title: widget.title!, total: _total, child: widget.header))
+          else if (widget.header != null)
+            SliverToBoxAdapter(child: widget.header),
           body,
           if (_items.isNotEmpty && (_loading || _error != null))
             SliverToBoxAdapter(
@@ -133,7 +142,46 @@ class _PagedGridState<T> extends State<PagedGrid<T>> {
                 ),
               ),
             ),
+          // room for the floating AI button
+          const SliverToBoxAdapter(child: SizedBox(height: 88)),
         ],
+      ),
+    );
+  }
+}
+
+/// White rounded card like the website's filter header: title, count, search.
+class _HeaderCard extends StatelessWidget {
+  const _HeaderCard({required this.title, required this.total, this.child});
+  final String title;
+  final int total;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Brand.line),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, color: Brand.ink)),
+            const SizedBox(height: 2),
+            Text('$total mavjud', style: theme.textTheme.bodyMedium?.copyWith(color: Brand.muted)),
+            if (child != null) ...[
+              const Padding(padding: EdgeInsets.only(top: 12), child: Divider(height: 1, color: Brand.line)),
+              child!,
+            ],
+          ],
+        ),
       ),
     );
   }

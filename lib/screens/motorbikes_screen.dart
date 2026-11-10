@@ -57,42 +57,42 @@ class _MotorbikesScreenState extends State<MotorbikesScreen> with AutomaticKeepA
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Column(
-      children: [
-        SearchBarRow(
-          hint: 'Mototsikl qidirish',
-          initialText: _filter.text,
-          activeFilters: _filter.activeCount,
-          onSearch: (text) {
-            if (text.trim() != _filter.text.trim()) _setFilter(_filter.copyWith(text: text));
-          },
-          onFilter: _openFilters,
-        ),
-        Expanded(
-          child: PagedGrid<Motorbike>(
+    return PagedGrid<Motorbike>(
             key: ValueKey(_version),
+            title: 'Mototsikllar',
+            header: SearchBarRow(
+              hint: 'Mototsikl qidirish',
+              initialText: _filter.text,
+              activeFilters: _filter.activeCount,
+              onSearch: (text) {
+                if (text.trim() != _filter.text.trim()) _setFilter(_filter.copyWith(text: text));
+              },
+              onFilter: _openFilters,
+            ),
             fetch: (page) => Repository.instance.motorbikes(_filter, page),
             emptyMessage: 'Bunday mototsikl topilmadi.\nFiltrlarni o\'zgartirib ko\'ring.',
             itemBuilder: (context, bike) => ListingCard(
               heroTag: 'bike-${bike.id}',
               image: bike.images.isEmpty ? null : bike.images.first,
               title: bike.title,
+              kicker: '${label(bike.brand)} · ${bike.year}',
+              badge: label(bike.type),
               price: formatPrice(bike.price, bike.currency),
-              subtitle: '${label(bike.brand)} · ${bike.year} · ${bike.engineCc}cc',
               location: label(bike.location),
-              tags: [
-                label(bike.condition),
-                if (bike.barter) 'Barter',
-                if (bike.rent) 'Ijara',
+              address: bike.address,
+              views: bike.views,
+              likes: bike.likes,
+              chips: [
+                CardChip(Icons.speed, '${bike.mileage} km'),
+                CardChip(Icons.two_wheeler, label(bike.condition)),
+                CardChip(Icons.settings, '${bike.engineCc} cc'),
               ],
+              action: bike.rent ? 'Band qilish' : 'Sotib olish',
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => MotorbikeDetailScreen(initial: bike)),
               ),
             ),
-          ),
-        ),
-      ],
     );
   }
 }

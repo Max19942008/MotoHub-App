@@ -1,47 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'api/auth_service.dart';
+import 'config.dart';
 import 'screens/assistant_screen.dart';
 import 'screens/motorbikes_screen.dart';
 import 'screens/parts_screen.dart';
 import 'screens/profile_screen.dart';
+import 'theme.dart';
+import 'widgets/common.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AuthService.instance.init(); // restore a saved session before the first request
-  runApp(const MotoHubApp());
+  runApp(const MotoprestoApp());
 }
 
-const _brand = Color(0xFFE8462B);
-
-class MotoHubApp extends StatelessWidget {
-  const MotoHubApp({super.key});
-
-  ThemeData _theme(Brightness brightness) {
-    final scheme = ColorScheme.fromSeed(seedColor: _brand, brightness: brightness);
-    return ThemeData(
-      colorScheme: scheme,
-      useMaterial3: true,
-      cardTheme: CardThemeData(
-        elevation: 0,
-        color: scheme.surfaceContainerLow,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-    );
-  }
+class MotoprestoApp extends StatelessWidget {
+  const MotoprestoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MotoHub',
+      title: 'MOTOPRESTO',
       debugShowCheckedModeBanner: false,
-      theme: _theme(Brightness.light),
-      darkTheme: _theme(Brightness.dark),
+      theme: Brand.theme(),
       home: const HomeShell(),
     );
   }
 }
 
+/// Pages reachable from the drawer, same order as the website menu.
+enum AppPage { bikes, parts, assistant, profile }
+
+/// Website layout: dark navbar (logo · Kirish · ☰), drawer menu,
+/// floating "AI Assistant" button bottom-left.
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
@@ -50,52 +43,219 @@ class HomeShell extends StatefulWidget {
 }
 
 class _HomeShellState extends State<HomeShell> {
-  int _tab = 0;
+  final _scaffold = GlobalKey<ScaffoldState>();
+  AppPage _page = AppPage.bikes;
+  String _partsCategory = 'SPARE_PART';
 
-  static const _titles = ['Mototsikllar', 'Qismlar', 'AI yordamchi', 'Profil'];
+  void _go(AppPage page, {String? category}) {
+    setState(() {
+      _page = page;
+      if (category != null) _partsCategory = category;
+    });
+    _scaffold.currentState?.closeEndDrawer();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 16,
-        title: Row(
-          children: [
-            Icon(Icons.two_wheeler, color: scheme.primary),
-            const SizedBox(width: 8),
-            Text('MotoHub', style: TextStyle(fontWeight: FontWeight.w800, color: scheme.primary)),
-            const SizedBox(width: 8),
-            ListenableBuilder(
-              listenable: AuthService.instance,
-              builder: (context, _) => Text(
-                '· ${_tab == 3 && !AuthService.instance.isLoggedIn ? 'Kirish' : _titles[_tab]}',
-                style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 16),
+    return ListenableBuilder(
+      listenable: AuthService.instance,
+      builder: (context, _) {
+        final auth = AuthService.instance;
+        return Scaffold(
+          key: _scaffold,
+          appBar: AppBar(
+            toolbarHeight: 60,
+            titleSpacing: 16,
+            title: GestureDetector(onTap: () => _go(AppPage.bikes), child: const BrandLogo(height: 36)),
+            actions: [
+              if (auth.isLoggedIn)
+                _AvatarButton(image: auth.member?.image, onTap: () => _go(AppPage.profile))
+              else
+                _LoginPill(onTap: () => _go(AppPage.profile)),
+              IconButton(
+                tooltip: 'Menyu',
+                icon: const Icon(Icons.menu, size: 28),
+                onPressed: () => _scaffold.currentState?.openEndDrawer(),
               ),
-            ),
-          ],
+              const SizedBox(width: 4),
+            ],
+          ),
+          endDrawer: _MenuDrawer(
+            page: _page,
+            partsCategory: _partsCategory,
+            loggedIn: auth.isLoggedIn,
+            onGo: _go,
+            onLogout: () {
+              _scaffold.currentState?.closeEndDrawer();
+              auth.logout();
+            },
+          ),
+          body: IndexedStack(
+            index: _page.index,
+            children: [
+              const MotorbikesScreen(),
+              PartsScreen(
+                category: _partsCategory,
+                onCategoryChanged: (c) => _partsCategory = c,
+              ),
+              const AssistantScreen(),
+              const ProfileScreen(),
+            ],
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+          floatingActionButton: _page == AppPage.assistant
+              ? null
+              : FloatingActionButton.extended(
+                  heroTag: 'ai-fab',
+                  backgroundColor: Brand.ai,
+                  foregroundColor: Colors.white,
+                  elevation: 6,
+                  shape: const StadiumBorder(),
+                  icon: const Icon(Icons.smart_toy_outlined),
+                  label: const Text('AI Assistant', style: TextStyle(fontWeight: FontWeight.w700)),
+                  onPressed: () => _go(AppPage.assistant),
+                ),
+        );
+      },
+    );
+  }
+}
+
+class _LoginPill extends StatelessWidget {
+  const _LoginPill({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 11),
+      child: OutlinedButton.icon(
+        onPressed: onTap,
+        icon: const Icon(Icons.account_circle_outlined, size: 20),
+        label: const Text('Kirish'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.white.withValues(alpha: 0.08),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
+          shape: const StadiumBorder(),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
         ),
       ),
-      body: IndexedStack(
-        index: _tab,
-        children: const [MotorbikesScreen(), PartsScreen(), AssistantScreen(), ProfileScreen()],
+    );
+  }
+}
+
+class _AvatarButton extends StatelessWidget {
+  const _AvatarButton({required this.image, required this.onTap});
+  final String? image;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: 'Profil',
+      onPressed: onTap,
+      icon: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 2),
+        ),
+        child: ClipOval(child: NetImage(image, iconSize: 18)),
       ),
-      bottomNavigationBar: ListenableBuilder(
-        listenable: AuthService.instance,
-        builder: (context, _) => NavigationBar(
-          selectedIndex: _tab,
-          onDestinationSelected: (i) => setState(() => _tab = i),
-          destinations: [
-            const NavigationDestination(
-                icon: Icon(Icons.two_wheeler_outlined), selectedIcon: Icon(Icons.two_wheeler), label: 'Mototsikllar'),
-            const NavigationDestination(icon: Icon(Icons.build_outlined), selectedIcon: Icon(Icons.build), label: 'Qismlar'),
-            const NavigationDestination(
-                icon: Icon(Icons.smart_toy_outlined), selectedIcon: Icon(Icons.smart_toy), label: 'AI yordamchi'),
-            NavigationDestination(
-              icon: const Icon(Icons.person_outline),
-              selectedIcon: const Icon(Icons.person),
-              label: AuthService.instance.isLoggedIn ? 'Profil' : 'Kirish',
+    );
+  }
+}
+
+class _MenuDrawer extends StatelessWidget {
+  const _MenuDrawer({
+    required this.page,
+    required this.partsCategory,
+    required this.loggedIn,
+    required this.onGo,
+    required this.onLogout,
+  });
+
+  final AppPage page;
+  final String partsCategory;
+  final bool loggedIn;
+  final void Function(AppPage page, {String? category}) onGo;
+  final VoidCallback onLogout;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget item(String label, bool active, VoidCallback onTap) => InkWell(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            decoration: BoxDecoration(
+              color: active ? Brand.green.withValues(alpha: 0.12) : null,
+              border: Border(left: BorderSide(color: active ? Brand.green : Colors.transparent, width: 3)),
             ),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: active ? Colors.white : Colors.white.withValues(alpha: 0.85),
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+
+    return Drawer(
+      width: 300,
+      shape: const RoundedRectangleBorder(),
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              height: 60,
+              padding: const EdgeInsets.only(left: 16, right: 4),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.08))),
+              ),
+              child: Row(
+                children: [
+                  const BrandLogo(height: 34),
+                  const Spacer(),
+                  IconButton(
+                    color: Colors.white,
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            item('Mototsikllar', page == AppPage.bikes, () => onGo(AppPage.bikes)),
+            item('Ehtiyot qismlar', page == AppPage.parts && partsCategory == 'SPARE_PART',
+                () => onGo(AppPage.parts, category: 'SPARE_PART')),
+            item('Aksessuarlar', page == AppPage.parts && partsCategory == 'ACCESSORY',
+                () => onGo(AppPage.parts, category: 'ACCESSORY')),
+            item('AI yordamchi', page == AppPage.assistant, () => onGo(AppPage.assistant)),
+            item(loggedIn ? 'Mening sahifam' : 'Kirish / Ro\'yxatdan o\'tish', page == AppPage.profile,
+                () => onGo(AppPage.profile)),
+            item('Maxfiylik siyosati', false,
+                () => launchUrl(Uri.parse(privacyUrl), mode: LaunchMode.externalApplication)),
+            const Spacer(),
+            if (loggedIn)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                child: OutlinedButton.icon(
+                  onPressed: onLogout,
+                  icon: const Icon(Icons.logout, size: 18),
+                  label: const Text('Chiqish'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFFFF6B6B),
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+                    minimumSize: const Size.fromHeight(46),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

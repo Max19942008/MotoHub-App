@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../theme.dart';
+
 /// Search field + filter button with an active-filter badge.
 /// Search fires 500 ms after the user stops typing.
 class SearchBarRow extends StatefulWidget {
@@ -44,7 +46,7 @@ class _SearchBarRowState extends State<SearchBarRow> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 8),
       child: Row(
         children: [
           Expanded(
@@ -52,6 +54,10 @@ class _SearchBarRowState extends State<SearchBarRow> {
               controller: _controller,
               hintText: widget.hint,
               elevation: const WidgetStatePropertyAll(0),
+              backgroundColor: const WidgetStatePropertyAll(Brand.page),
+              side: const WidgetStatePropertyAll(BorderSide(color: Brand.line)),
+              shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              constraints: const BoxConstraints(minHeight: 48),
               leading: const Icon(Icons.search),
               onChanged: _changed,
               onSubmitted: (v) {
@@ -74,9 +80,15 @@ class _SearchBarRowState extends State<SearchBarRow> {
           Badge(
             isLabelVisible: widget.activeFilters > 0,
             label: Text('${widget.activeFilters}'),
-            child: IconButton.filledTonal(
+            child: IconButton.outlined(
               icon: const Icon(Icons.tune),
               tooltip: 'Filtrlar',
+              style: IconButton.styleFrom(
+                foregroundColor: Brand.ink,
+                side: const BorderSide(color: Brand.line),
+                fixedSize: const Size(48, 48),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
               onPressed: widget.onFilter,
             ),
           ),
