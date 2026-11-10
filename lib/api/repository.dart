@@ -366,7 +366,7 @@ class Repository {
     );
   }
 
-  /// [group] is PROPERTY or PART.
+  /// [group] is PROPERTY, MEMBER or ARTICLE.
   Future<void> addComment(String group, String refId, String content) =>
       _gql.query(
         r'mutation ($input: CommentInput!) { createComment(input: $input) { _id } }',
@@ -491,6 +491,64 @@ class Repository {
   Future<void> unfollow(String id) =>
       _gql.query(r'mutation ($id: String!) { unsubscribe(input: $id) { _id } }',
           variables: {'id': id});
+
+  // ---- community ----
+
+  static const _articleFields = '''
+    _id articleCategory articleTitle articleContent articleImage articleViews
+    articleLikes articleComments createdAt meLiked { myFavorite }
+    memberData { _id memberNick memberImage }
+  ''';
+
+  /// [category]: FREE | RECOMMEND | NEWS | HUMOR.
+  Future<PageResult<Article>> articles(String category, int page) async {
+    final data = await _gql.query('''
+      query (\$input: BoardArticlesInquiry!) {
+        getBoardArticles(input: \$input) { list { $_articleFields } metaCounter { total } }
+      }
+    ''', variables: {
+      'input': {
+        'page': page,
+        'limit': 6,
+        'sort': 'createdAt',
+        'direction': 'DESC',
+        'search': {'articleCategory': category},
+      },
+    });
+    final result = data['getBoardArticles'] as Map<String, dynamic>;
+    return PageResult(
+      (result['list'] as List)
+          .map((e) => Article.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      _total(result),
+    );
+  }
+
+  Future<Article> article(String id) async {
+    final data = await _gql.query('''
+      query (\$id: String!) { getBoardArticle(articleId: \$id) { $_articleFields } }
+    ''', variables: {'id': id});
+    return Article.fromJson(data['getBoardArticle'] as Map<String, dynamic>);
+  }
+
+  Future<void> likeArticle(String id) => _gql.query(
+      r'mutation ($id: String!) { likeTargetArticle(articleId: $id) { _id } }',
+      variables: {'id': id});
+
+  Future<String> createArticle(
+      String category, String title, String content) async {
+    final data = await _gql.query(
+      r'mutation ($input: BoardArticleInput!) { createBoardArticle(input: $input) { _id } }',
+      variables: {
+        'input': {
+          'articleCategory': category,
+          'articleTitle': title,
+          'articleContent': content,
+        },
+      },
+    );
+    return '${(data['createBoardArticle'] as Map)['_id']}';
+  }
 
   int _total(Map<String, dynamic> result) {
     final counter = result['metaCounter'];

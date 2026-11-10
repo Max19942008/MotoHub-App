@@ -274,3 +274,56 @@ class Comment {
     );
   }
 }
+
+/// A community post (BoardArticle on the backend).
+class Article {
+  Article({
+    required this.id,
+    required this.category,
+    required this.title,
+    required this.content,
+    this.image,
+    this.views = 0,
+    this.likes = 0,
+    this.comments = 0,
+    this.liked = false,
+    this.createdAt,
+    this.authorId,
+    this.author = '',
+    this.authorImage,
+  });
+
+  final String id;
+  final String category;
+  final String title;
+  final String content;
+  final String? image;
+  final int views;
+  final int likes;
+  final int comments;
+  final bool liked;
+  final DateTime? createdAt;
+  final String? authorId;
+  final String author;
+  final String? authorImage;
+
+  factory Article.fromJson(Map<String, dynamic> j) {
+    final member = j['memberData'] as Map<String, dynamic>?;
+    final image = j['articleImage'] as String?;
+    return Article(
+      id: '${j['_id']}',
+      category: '${j['articleCategory'] ?? 'FREE'}',
+      title: '${j['articleTitle'] ?? ''}',
+      content: '${j['articleContent'] ?? ''}',
+      image: (image == null || image.isEmpty) ? null : image,
+      views: (j['articleViews'] as num?)?.toInt() ?? 0,
+      likes: (j['articleLikes'] as num?)?.toInt() ?? 0,
+      comments: (j['articleComments'] as num?)?.toInt() ?? 0,
+      liked: _flag(j['meLiked'], 'myFavorite'),
+      createdAt: DateTime.tryParse('${j['createdAt'] ?? ''}'),
+      authorId: member?['_id'] as String?,
+      author: '${member?['memberNick'] ?? ''}',
+      authorImage: member?['memberImage'] as String?,
+    );
+  }
+}

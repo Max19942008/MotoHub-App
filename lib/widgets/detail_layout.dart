@@ -637,8 +637,10 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                       fontSize: 14,
                       fontWeight: FontWeight.w600),
                 ),
-                onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => AgentDetailScreen(agentId: s.id))),
+                onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => AgentDetailScreen(agentId: s.id))),
                 child: const Text('View Dealer'),
               ),
             ),

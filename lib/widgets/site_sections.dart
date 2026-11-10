@@ -352,110 +352,114 @@ class AgentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final phone = agent.phone ?? '';
     return GestureDetector(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (_) => AgentDetailScreen(agentId: agent.id))),
+      onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => AgentDetailScreen(agentId: agent.id))),
       child: Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 16,
-              offset: const Offset(0, 6))
-        ],
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 26, 20, 26),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                width: 176,
-                height: 176,
-                padding: const EdgeInsets.all(3),
-                decoration: const BoxDecoration(
-                    shape: BoxShape.circle, color: Color(0xFFE0E0FB)),
-                child: ClipOval(child: NetImage(agent.image, iconSize: 48)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 16,
+                offset: const Offset(0, 6))
+          ],
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 26, 20, 26),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 176,
+                  height: 176,
+                  padding: const EdgeInsets.all(3),
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: Color(0xFFE0E0FB)),
+                  child: ClipOval(child: NetImage(agent.image, iconSize: 48)),
+                ),
+                Positioned(
+                  right: -4,
+                  top: -6,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                          colors: [Brand.indigo, Brand.indigoDark]),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Brand.indigo.withValues(alpha: 0.35),
+                            blurRadius: 10)
+                      ],
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Icon(Icons.star_rounded,
+                          color: Colors.white, size: 15),
+                      const SizedBox(width: 3),
+                      Text(agent.rank.toStringAsFixed(1),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 13)),
+                    ]),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 22),
+            Text(agent.nick,
+                style: const TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w800,
+                    color: Brand.ink)),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F1FD),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFDADAF8)),
               ),
-              Positioned(
-                right: -4,
-                top: -6,
+              child: const Text('AGENT',
+                  style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF6B7280),
+                      letterSpacing: 0.8)),
+            ),
+            if (phone.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () => launchUrl(Uri(scheme: 'tel', path: phone)),
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                        colors: [Brand.indigo, Brand.indigoDark]),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Brand.indigo.withValues(alpha: 0.35),
-                          blurRadius: 10)
-                    ],
+                    color: const Color(0xFFF7F7FE),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFDADAF8)),
                   ),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    const Icon(Icons.star_rounded,
-                        color: Colors.white, size: 15),
-                    const SizedBox(width: 3),
-                    Text(agent.rank.toStringAsFixed(1),
+                    const Icon(Icons.call, size: 17, color: Brand.indigo),
+                    const SizedBox(width: 8),
+                    Text(phone,
                         style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 13)),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                            color: Brand.ink)),
                   ]),
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 22),
-          Text(agent.nick,
-              style: const TextStyle(
-                  fontSize: 21, fontWeight: FontWeight.w800, color: Brand.ink)),
-          const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1F1FD),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFDADAF8)),
-            ),
-            child: const Text('AGENT',
-                style: TextStyle(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF6B7280),
-                    letterSpacing: 0.8)),
-          ),
-          if (phone.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () => launchUrl(Uri(scheme: 'tel', path: phone)),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF7F7FE),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFDADAF8)),
-                ),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  const Icon(Icons.call, size: 17, color: Brand.indigo),
-                  const SizedBox(width: 8),
-                  Text(phone,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                          color: Brand.ink)),
-                ]),
-              ),
-            ),
           ],
-        ],
-      ),
+        ),
       ),
     );
   }
