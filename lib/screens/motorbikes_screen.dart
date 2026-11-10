@@ -87,7 +87,8 @@ class _MotorbikesScreenState extends State<MotorbikesScreen> with AutomaticKeepA
                 CardChip(Icons.two_wheeler, label(bike.condition)),
                 CardChip(Icons.settings, '${bike.engineCc} cc'),
               ],
-              action: bike.rent ? 'Band qilish' : 'Sotib olish',
+              rating: bike.rank,
+              action: 'Sotib Olish',
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => MotorbikeDetailScreen(initial: bike)),

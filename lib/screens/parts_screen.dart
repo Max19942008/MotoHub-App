@@ -121,7 +121,8 @@ class _PartsScreenState extends State<PartsScreen> with AutomaticKeepAliveClient
           CardChip(Icons.inventory_2_outlined, '${part.stock} dona'),
           if (part.barter) const CardChip(Icons.swap_horiz, 'Barter'),
         ],
-        action: 'Sotib olish',
+        rating: part.rank,
+        action: 'Sotib Olish',
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => PartDetailScreen(initial: part)),

@@ -11,6 +11,10 @@ class Brand {
   /// Site navbar / footer.
   static const ink = Color(0xFF181A20);
 
+  /// "Popular / Top" sections on the site.
+  static const indigo = Color(0xFF6366F1);
+  static const indigoDark = Color(0xFF4F46E5);
+
   /// Floating "AI Assistant" button on the site.
   static const ai = Color(0xFFE8462B);
 

@@ -47,11 +47,11 @@ String label(String value) {
 }
 
 /// 12500 -> "12 500".
-String groupDigits(num n) {
+String groupDigits(num n, {String sep = ' '}) {
   final s = n.round().toString();
   final buf = StringBuffer();
   for (var i = 0; i < s.length; i++) {
-    if (i > 0 && (s.length - i) % 3 == 0) buf.write(' ');
+    if (i > 0 && (s.length - i) % 3 == 0) buf.write(sep);
     buf.write(s[i]);
   }
   return buf.toString();
@@ -60,7 +60,7 @@ String groupDigits(num n) {
 String formatPrice(num price, String currency) {
   switch (currency) {
     case 'USD':
-      return '\$${groupDigits(price)}';
+      return '\$${groupDigits(price, sep: ',')}'; // same as the website
     case 'UZS':
       return '${groupDigits(price)} so\'m';
     case 'KRW':

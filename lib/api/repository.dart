@@ -9,14 +9,14 @@ const _sellerFields = '''
 const _motorbikeFields = '''
   _id propertyType propertyLocation propertyBrand propertyCondition propertyAddress
   propertyTitle propertyPrice propertyCurrency propertyYear propertyEngineCc
-  propertyMileAge propertyViews propertyLikes propertyImages propertyDesc
+  propertyMileAge propertyViews propertyLikes propertyRank propertyImages propertyDesc
   propertyBarter propertyRent createdAt
   $_sellerFields
 ''';
 
 const _partFields = '''
   _id partCategory partType partLocation partBrand partCondition partTitle
-  partPrice partCurrency partStockCount partCompatibleBrands partViews partLikes
+  partPrice partCurrency partStockCount partCompatibleBrands partViews partLikes partRank
   partImages partDesc partBarter createdAt
   $_sellerFields
 ''';
@@ -171,6 +171,50 @@ class Repository {
       (result['list'] as List).map((e) => Motorbike.fromJson(e as Map<String, dynamic>)).toList(),
       _total(result),
     );
+  }
+
+  /// Home carousels: a fixed top-N by [sort] (propertyLikes | propertyViews | propertyRank).
+  Future<List<Motorbike>> topMotorbikes(String sort, int limit) async {
+    final data = await _gql.query('''
+      query (\$input: PropertiesInquiry!) { getProperties(input: \$input) { list { $_motorbikeFields } } }
+    ''', variables: {
+      'input': {'page': 1, 'limit': limit, 'sort': sort, 'direction': 'DESC', 'search': <String, dynamic>{}},
+    });
+    return ((data['getProperties'] as Map<String, dynamic>)['list'] as List)
+        .map((e) => Motorbike.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Home "Top spare parts / accessories" carousels.
+  Future<List<Part>> topParts(String category, int limit) async {
+    final data = await _gql.query('''
+      query (\$input: PartsInquiry!) { getParts(input: \$input) { list { $_partFields } } }
+    ''', variables: {
+      'input': {
+        'page': 1,
+        'limit': limit,
+        'sort': 'partRank',
+        'direction': 'DESC',
+        'search': {'categoryList': [category]},
+      },
+    });
+    return ((data['getParts'] as Map<String, dynamic>)['list'] as List)
+        .map((e) => Part.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Home "Elite riders" carousel.
+  Future<List<Agent>> topAgents(int limit) async {
+    final data = await _gql.query('''
+      query (\$input: AgentsInquiry!) {
+        getAgents(input: \$input) { list { _id memberNick memberPhone memberImage memberRank memberType } }
+      }
+    ''', variables: {
+      'input': {'page': 1, 'limit': limit, 'sort': 'memberRank', 'direction': 'DESC', 'search': <String, dynamic>{}},
+    });
+    return ((data['getAgents'] as Map<String, dynamic>)['list'] as List)
+        .map((e) => Agent.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<Motorbike> motorbike(String id) async {

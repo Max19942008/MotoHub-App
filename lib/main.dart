@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'api/auth_service.dart';
 import 'config.dart';
 import 'screens/assistant_screen.dart';
+import 'screens/home_screen.dart';
 import 'screens/motorbikes_screen.dart';
 import 'screens/parts_screen.dart';
 import 'screens/profile_screen.dart';
@@ -31,7 +32,7 @@ class MotoprestoApp extends StatelessWidget {
 }
 
 /// Pages reachable from the drawer, same order as the website menu.
-enum AppPage { bikes, parts, assistant, profile }
+enum AppPage { home, bikes, parts, assistant, profile }
 
 /// Website layout: dark navbar (logo · Kirish · ☰), drawer menu,
 /// floating "AI Assistant" button bottom-left.
@@ -44,7 +45,7 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   final _scaffold = GlobalKey<ScaffoldState>();
-  AppPage _page = AppPage.bikes;
+  AppPage _page = AppPage.home;
   String _partsCategory = 'SPARE_PART';
 
   void _go(AppPage page, {String? category}) {
@@ -66,7 +67,7 @@ class _HomeShellState extends State<HomeShell> {
           appBar: AppBar(
             toolbarHeight: 60,
             titleSpacing: 16,
-            title: GestureDetector(onTap: () => _go(AppPage.bikes), child: const BrandLogo(height: 36)),
+            title: GestureDetector(onTap: () => _go(AppPage.home), child: const BrandLogo(height: 36)),
             actions: [
               if (auth.isLoggedIn)
                 _AvatarButton(image: auth.member?.image, onTap: () => _go(AppPage.profile))
@@ -93,6 +94,7 @@ class _HomeShellState extends State<HomeShell> {
           body: IndexedStack(
             index: _page.index,
             children: [
+              const HomeScreen(),
               const MotorbikesScreen(),
               PartsScreen(
                 category: _partsCategory,
@@ -105,16 +107,7 @@ class _HomeShellState extends State<HomeShell> {
           floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
           floatingActionButton: _page == AppPage.assistant
               ? null
-              : FloatingActionButton.extended(
-                  heroTag: 'ai-fab',
-                  backgroundColor: Brand.ai,
-                  foregroundColor: Colors.white,
-                  elevation: 6,
-                  shape: const StadiumBorder(),
-                  icon: const Icon(Icons.smart_toy_outlined),
-                  label: const Text('AI Assistant', style: TextStyle(fontWeight: FontWeight.w700)),
-                  onPressed: () => _go(AppPage.assistant),
-                ),
+              : _AiFab(onTap: () => _go(AppPage.assistant)),
         );
       },
     );
@@ -231,6 +224,7 @@ class _MenuDrawer extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
+            item('Bosh sahifa', page == AppPage.home, () => onGo(AppPage.home)),
             item('Mototsikllar', page == AppPage.bikes, () => onGo(AppPage.bikes)),
             item('Ehtiyot qismlar', page == AppPage.parts && partsCategory == 'SPARE_PART',
                 () => onGo(AppPage.parts, category: 'SPARE_PART')),
@@ -257,6 +251,41 @@ class _MenuDrawer extends StatelessWidget {
                 ),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The website's floating "AI Assistant" pill (48px high).
+class _AiFab extends StatelessWidget {
+  const _AiFab({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Brand.ai,
+      shape: const StadiumBorder(),
+      elevation: 0,
+      child: InkWell(
+        customBorder: const StadiumBorder(),
+        onTap: onTap,
+        child: Ink(
+          height: 48,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: ShapeDecoration(
+            shape: const StadiumBorder(),
+            shadows: [BoxShadow(color: Brand.ai.withValues(alpha: 0.35), blurRadius: 24, offset: const Offset(0, 8))],
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.smart_toy_outlined, color: Colors.white, size: 22),
+              SizedBox(width: 8),
+              Text('AI Assistant', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14.5)),
+            ],
+          ),
         ),
       ),
     );

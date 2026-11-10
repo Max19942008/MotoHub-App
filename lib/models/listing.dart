@@ -37,6 +37,7 @@ class Motorbike {
     required this.mileage,
     required this.views,
     required this.likes,
+    this.rank = 0,
     required this.images,
     required this.barter,
     required this.rent,
@@ -59,6 +60,7 @@ class Motorbike {
   final int mileage;
   final int views;
   final int likes;
+  final num rank;
   final List<String> images;
   final bool barter;
   final bool rent;
@@ -81,6 +83,7 @@ class Motorbike {
         mileage: (j['propertyMileAge'] as num?)?.toInt() ?? 0,
         views: (j['propertyViews'] as num?)?.toInt() ?? 0,
         likes: (j['propertyLikes'] as num?)?.toInt() ?? 0,
+        rank: (j['propertyRank'] as num?) ?? 0,
         images: ((j['propertyImages'] as List?) ?? const []).map((e) => '$e').toList(),
         barter: j['propertyBarter'] == true,
         rent: j['propertyRent'] == true,
@@ -106,6 +109,7 @@ class Part {
     required this.compatibleBrands,
     required this.views,
     required this.likes,
+    this.rank = 0,
     required this.images,
     required this.barter,
     this.description,
@@ -126,6 +130,7 @@ class Part {
   final List<String> compatibleBrands;
   final int views;
   final int likes;
+  final num rank;
   final List<String> images;
   final bool barter;
   final String? description;
@@ -146,6 +151,7 @@ class Part {
         compatibleBrands: ((j['partCompatibleBrands'] as List?) ?? const []).map((e) => '$e').toList(),
         views: (j['partViews'] as num?)?.toInt() ?? 0,
         likes: (j['partLikes'] as num?)?.toInt() ?? 0,
+        rank: (j['partRank'] as num?) ?? 0,
         images: ((j['partImages'] as List?) ?? const []).map((e) => '$e').toList(),
         barter: j['partBarter'] == true,
         description: j['partDesc'] as String?,
@@ -158,4 +164,25 @@ class PageResult<T> {
   PageResult(this.items, this.total);
   final List<T> items;
   final int total;
+}
+
+/// A dealer shown in the home "Elite riders" carousel.
+class Agent {
+  Agent({required this.id, required this.nick, this.phone, this.image, this.rank = 0, this.type});
+
+  final String id;
+  final String nick;
+  final String? phone;
+  final String? image;
+  final num rank;
+  final String? type;
+
+  factory Agent.fromJson(Map<String, dynamic> j) => Agent(
+        id: '${j['_id']}',
+        nick: '${j['memberNick'] ?? ''}',
+        phone: j['memberPhone'] as String?,
+        image: j['memberImage'] as String?,
+        rank: (j['memberRank'] as num?) ?? 0,
+        type: j['memberType'] as String?,
+      );
 }
