@@ -367,3 +367,31 @@ class FollowMember {
     );
   }
 }
+
+/// One row of the notifications page.
+class AppNotification {
+  AppNotification({
+    required this.id,
+    required this.type,
+    required this.title,
+    this.description,
+    this.unread = false,
+    this.createdAt,
+  });
+
+  final String id;
+  final String type;
+  final String title;
+  final String? description;
+  final bool unread;
+  final DateTime? createdAt;
+
+  factory AppNotification.fromJson(Map<String, dynamic> j) => AppNotification(
+        id: '${j['_id']}',
+        type: '${j['notificationType'] ?? ''}',
+        title: '${j['notificationTitle'] ?? ''}',
+        description: j['notificationDesc'] as String?,
+        unread: j['notificationStatus'] == 'WAIT',
+        createdAt: DateTime.tryParse('${j['createdAt'] ?? ''}'),
+      );
+}

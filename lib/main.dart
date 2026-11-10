@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'api/auth_service.dart';
+import 'api/repository.dart';
 import 'config.dart';
 import 'screens/agents_screen.dart';
 import 'screens/community_screen.dart';
+import 'screens/help_screen.dart';
+import 'screens/notifications_screen.dart';
 import 'screens/my_page_screen.dart' show DefaultAvatar;
 import 'screens/assistant_screen.dart';
 import 'screens/home_screen.dart';
@@ -36,7 +39,7 @@ class MotoprestoApp extends StatelessWidget {
 }
 
 /// Pages reachable from the drawer, same order as the website menu.
-enum AppPage { home, bikes, parts, agents, community, assistant, profile }
+enum AppPage { home, bikes, parts, agents, community, help, assistant, profile }
 
 /// Website layout: dark navbar (logo · Kirish · ☰), drawer menu,
 /// floating "AI Assistant" button bottom-left.
@@ -81,6 +84,7 @@ class _HomeShellState extends State<HomeShell> {
                   onTap: () => _go(AppPage.home),
                   child: const BrandLogo(height: 36)),
               actions: [
+                if (auth.isLoggedIn) const _BellButton(),
                 if (auth.isLoggedIn)
                   _AvatarButton(
                       image: auth.member?.image,
@@ -116,6 +120,7 @@ class _HomeShellState extends State<HomeShell> {
                 ),
                 const AgentsScreen(),
                 const CommunityScreen(),
+                const HelpScreen(),
                 const AssistantScreen(),
                 const ProfileScreen(),
               ],
@@ -153,6 +158,48 @@ class _LoginPill extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14),
           textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
         ),
+      ),
+    );
+  }
+}
+
+/// Bell with the unread count, like the site's header; opens notifications.
+class _BellButton extends StatefulWidget {
+  const _BellButton();
+
+  @override
+  State<_BellButton> createState() => _BellButtonState();
+}
+
+class _BellButtonState extends State<_BellButton> {
+  int _unread = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _refresh();
+  }
+
+  Future<void> _refresh() async {
+    try {
+      final (_, unread) = await Repository.instance.notifications();
+      if (mounted) setState(() => _unread = unread);
+    } catch (_) {/* badge is optional */}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: 'Bildirishnomalar',
+      onPressed: () async {
+        await Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const NotificationsScreen()));
+        _refresh();
+      },
+      icon: Badge(
+        isLabelVisible: _unread > 0,
+        label: Text('$_unread'),
+        child: const Icon(Icons.notifications_none, size: 26),
       ),
     );
   }
@@ -269,6 +316,7 @@ class _MenuDrawer extends StatelessWidget {
                 'Agentlar', page == AppPage.agents, () => onGo(AppPage.agents)),
             item('Hamjamiyat', page == AppPage.community,
                 () => onGo(AppPage.community)),
+            item('Yordam', page == AppPage.help, () => onGo(AppPage.help)),
             item('AI yordamchi', page == AppPage.assistant,
                 () => onGo(AppPage.assistant)),
             item(loggedIn ? 'Mening sahifam' : 'Kirish / Ro\'yxatdan o\'tish',

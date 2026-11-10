@@ -712,6 +712,53 @@ class Repository {
           ? savePart({'partStatus': status}, id: id)
           : saveMotorbike({'propertyStatus': status}, id: id);
 
+  // ---- notifications ----
+
+  /// Newest first, plus the unread count for the bell badge.
+  Future<(List<AppNotification>, int)> notifications() async {
+    final data = await _gql.query(r"""
+      query ($input: NotificationInquiry!) {
+        getNotifications(input: $input) {
+          list { _id notificationType notificationStatus notificationTitle notificationDesc createdAt }
+          unreadCounter { total }
+        }
+      }
+    """, variables: {
+      'input': {
+        'page': 1,
+        'limit': 50,
+        'sort': 'createdAt',
+        'direction': 'DESC',
+        'search': <String, dynamic>{},
+      },
+    });
+    final result = data['getNotifications'] as Map<String, dynamic>;
+    final unread = result['unreadCounter'];
+    return (
+      (result['list'] as List)
+          .map((e) => AppNotification.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      unread is List && unread.isNotEmpty
+          ? ((unread.first['total'] as num?)?.toInt() ?? 0)
+          : 0,
+    );
+  }
+
+  /// No ids = mark everything read (same as the site's "Mark all read").
+  Future<void> markNotificationsRead([List<String>? ids]) => _gql.query(
+          r'mutation ($input: NotificationReadInput) { markNotificationsRead(input: $input) }',
+          variables: {
+            'input': {if (ids != null) '_id': ids}
+          });
+
+  Future<void> deleteNotification(String id) => _gql.query(
+          r'mutation ($input: NotificationDeleteInput) { deleteNotification(input: $input) }',
+          variables: {
+            'input': {
+              '_id': [id]
+            }
+          });
+
   Future<String> uploadImage(String filePath, String target) =>
       _gql.uploadImage(filePath, target);
 
