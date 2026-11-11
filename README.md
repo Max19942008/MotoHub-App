@@ -42,7 +42,7 @@ Without that file the release build falls back to the debug key (fine for `flutt
 
 Play listing assets are in `store/` (512 px icon, 1024×500 feature graphic). Launcher icons are generated from `assets/icon/` with `dart run flutter_launcher_icons`.
 
-- Package name: `uz.motohub.app`
+- Package name: `online.motopresto.app`
 - Privacy policy: https://motopresto.online/privacy
 - Account deletion: in the app (Profile → Hisobni o'chirish) and at https://motopresto.online/account/delete
 

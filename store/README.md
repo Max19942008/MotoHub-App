@@ -8,7 +8,7 @@
 | `feature_graphic_1024x500.png` | Feature graphic (1024×500) |
 | `screenshots/*.png` | Phone screenshots (1080×2160, kamida 2 ta, 8 tagacha) |
 
-- **Package name:** `uz.motohub.app` (keyin o'zgartirib bo'lmaydi)
+- **Package name:** `online.motopresto.app` (keyin o'zgartirib bo'lmaydi)
 - **Upload key:** `C:\dev\keys\motohub-upload.jks` (alias `upload`). Google Drive'ga zaxira qiling (D: emas!). Play App Signing'ni yoqing (standart).
 - **Privacy policy URL:** https://motopresto.online/privacy
 - **Account deletion URL:** https://motopresto.online/account/delete

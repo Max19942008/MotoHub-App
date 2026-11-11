@@ -26,7 +26,7 @@ android {
 
     defaultConfig {
         // Play Store identity: never change after the first upload.
-        applicationId = "uz.motohub.app"
+        applicationId = "online.motopresto.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
