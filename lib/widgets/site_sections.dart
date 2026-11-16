@@ -593,6 +593,11 @@ class SiteFooter extends StatelessWidget {
                     style: TextStyle(color: muted, fontSize: 14, height: 1.5)),
                 const SizedBox(height: 14),
                 TextField(
+                  // A focused field pulls its scroll view back to itself on
+                  // every keyboard resize, so a phone user who touched this box
+                  // could never scroll up past the footer again. Touching
+                  // anywhere else (including starting a scroll) lets go of it.
+                  onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: 'Email manzilingizni kiriting'.tr,
