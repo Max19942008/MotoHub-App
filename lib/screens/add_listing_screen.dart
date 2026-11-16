@@ -274,7 +274,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
         : motorbikeTypes;
     String yesNo(String v) => v == 'true' ? 'Ha' : "Yo'q";
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 60, title: const BrandLogo(height: 36)),
+      appBar: AppBar(toolbarHeight: 60, title: const BrandLogo()),
       backgroundColor: const Color(0xFFF6F6F6),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),

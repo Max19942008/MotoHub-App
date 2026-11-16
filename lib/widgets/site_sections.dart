@@ -559,7 +559,7 @@ class SiteFooter extends StatelessWidget {
           Container(
               color: Colors.black,
               padding: const EdgeInsets.all(4),
-              child: const BrandLogo(height: 40)),
+              child: const BrandLogo(height: 48)),
           const SizedBox(height: 22),
           const Text(
             'Mukammal mototsiklni topishda ishonchli hamkoringiz. Mototsikl xizmatlari va hamjamiyatida mukammallikni his eting.',

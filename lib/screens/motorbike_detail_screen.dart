@@ -65,8 +65,18 @@ class _MotorbikeDetailScreenState extends State<MotorbikeDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final b = _bike;
+    // Same wording as the site; nothing when the bike is only for sale.
     final options =
-        b.barter ? 'Ayirboshlash' : 'Ijara mavjud'; // same wording as the site
+        b.barter ? 'Ayirboshlash' : (b.rent ? 'Ijara mavjud' : '');
+    // City and street on one line; skip the city if the address already
+    // starts with it.
+    final city = label(b.location);
+    final street = b.address.trim();
+    final place = street.isEmpty
+        ? city
+        : street.toLowerCase().startsWith(city.toLowerCase())
+            ? street
+            : '$city, $street';
     return SiteDetailPage(
       id: b.id,
       crumb: 'Mototsikl',
@@ -76,7 +86,6 @@ class _MotorbikeDetailScreenState extends State<MotorbikeDetailScreen> {
       images: b.images,
       price: formatPrice(b.price, b.currency),
       pricePeriod: b.rent ? 'per month' : (b.barter ? 'for exchange' : 'total'),
-      overlayPeriod: b.rent ? '/month' : (b.barter ? '/exchange' : ''),
       views: b.views,
       likes: b.likes,
       liked: b.liked,
@@ -92,15 +101,12 @@ class _MotorbikeDetailScreenState extends State<MotorbikeDetailScreen> {
       descTitle: 'Mototsikl tavsifi',
       description: b.description,
       detailsTitle: 'Mototsikl tafsilotlari',
+      // Only what the cards above don't already show: price, engine, year
+      // and type are on the price card and the spec cards.
       details: [
-        DetailRow('Narx', formatPrice(b.price, b.currency)),
-        DetailRow('Manzil', label(b.location)),
-        DetailRow('Manzil', b.address),
-        DetailRow('Dvigatel', '${b.engineCc} CC'),
-        DetailRow('Yil', '${b.year}'),
-        DetailRow('Mototsikl turi', label(b.type)),
+        DetailRow('Manzil', place),
         DetailRow('Holati', label(b.condition)),
-        DetailRow("Qo'shimchalar", options),
+        if (options.isNotEmpty) DetailRow("Qo'shimchalar", options),
       ],
       onLike: () => Repository.instance.likeMotorbike(b.id),
       onInterest: () => Repository.instance.notifyInterest(b.id),

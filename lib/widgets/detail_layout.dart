@@ -46,7 +46,6 @@ class SiteDetailPage extends StatefulWidget {
     required this.images,
     required this.price,
     required this.pricePeriod,
-    required this.overlayPeriod,
     required this.views,
     required this.likes,
     required this.liked,
@@ -79,8 +78,6 @@ class SiteDetailPage extends StatefulWidget {
   /// "total" / "per month" under the price card.
   final String pricePeriod;
 
-  /// "/month" / "/exchange" / "" on the photo.
-  final String overlayPeriod;
   final int views;
   final int likes;
   final bool liked;
@@ -164,7 +161,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
       appBar: AppBar(
           toolbarHeight: 60,
           automaticallyImplyLeading: false,
-          title: const BrandLogo(height: 36)),
+          title: const BrandLogo()),
       body: RefreshIndicator(
         onRefresh: widget.onRefresh,
         child: ListView(
@@ -262,37 +259,8 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                         ],
                       ),
                     ),
-                    Positioned(
-                      left: 20,
-                      bottom: 20,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 18, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.8),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('NARX',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600)),
-                            Text(widget.price,
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w800)),
-                            if (widget.overlayPeriod.isNotEmpty)
-                              Text(widget.overlayPeriod,
-                                  style: const TextStyle(
-                                      color: Colors.white70, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                    ),
+                    // No price on the photo: the price card sits right
+                    // below it, so it would show the same price twice.
                   ],
                 ),
               ),

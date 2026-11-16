@@ -86,7 +86,7 @@ class _HomeShellState extends State<HomeShell> {
               titleSpacing: 16,
               title: GestureDetector(
                   onTap: () => _go(AppPage.home),
-                  child: const BrandLogo(height: 36)),
+                  child: const BrandLogo()),
               actions: [
                 if (auth.isLoggedIn) const _BellButton(),
                 if (auth.isLoggedIn)
@@ -294,7 +294,7 @@ class _MenuDrawer extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const BrandLogo(height: 34),
+                  const BrandLogo(height: 36),
                   const Spacer(),
                   IconButton(
                     color: Colors.white,

@@ -60,7 +60,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     final items = _items;
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 60, title: const BrandLogo(height: 36)),
+      appBar: AppBar(toolbarHeight: 60, title: const BrandLogo()),
       backgroundColor: Colors.white,
       body: RefreshIndicator(
         onRefresh: _load,

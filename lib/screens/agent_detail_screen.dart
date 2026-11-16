@@ -83,7 +83,7 @@ class _AgentDetailScreenState extends State<AgentDetailScreen> {
     final a = _agent;
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      appBar: AppBar(toolbarHeight: 60, title: const BrandLogo(height: 36)),
+      appBar: AppBar(toolbarHeight: 60, title: const BrandLogo()),
       body: a == null
           ? const LoadingView()
           : RefreshIndicator(

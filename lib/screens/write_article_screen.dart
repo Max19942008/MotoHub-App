@@ -86,7 +86,7 @@ class _WriteArticleScreenState extends State<WriteArticleScreen> {
     const label = TextStyle(
         fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF7F838D));
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 60, title: const BrandLogo(height: 36)),
+      appBar: AppBar(toolbarHeight: 60, title: const BrandLogo()),
       backgroundColor: const Color(0xFFF7F8FA),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 26, 20, 40),

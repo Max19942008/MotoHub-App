@@ -100,7 +100,7 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
   Widget build(BuildContext context) {
     final a = _article;
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 60, title: const BrandLogo(height: 36)),
+      appBar: AppBar(toolbarHeight: 60, title: const BrandLogo()),
       body: DecoratedBox(
         decoration: const BoxDecoration(gradient: communityBackground),
         child: RefreshIndicator(

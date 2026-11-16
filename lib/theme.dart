@@ -101,13 +101,14 @@ class Brand {
   }
 }
 
-/// White MOTOPRESTO mark for dark backgrounds (navbar, drawer).
+/// The MOTOPRESTO logo, the same file and sizes the website uses
+/// (ignition/public/img/logo/motopresto.png: 38px navbar, 36px drawer).
 class BrandLogo extends StatelessWidget {
-  const BrandLogo({super.key, this.height = 34});
+  const BrandLogo({super.key, this.height = 38});
   final double height;
 
   @override
   Widget build(BuildContext context) =>
-      Image.asset('assets/brand/logo_white.png',
+      Image.asset('assets/brand/logo.png',
           height: height, fit: BoxFit.contain, semanticLabel: 'MOTOPRESTO');
 }
