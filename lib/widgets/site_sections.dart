@@ -248,6 +248,16 @@ class SiteCarousel extends StatefulWidget {
   /// The agents slider uses ‹ › instead of arrows.
   final bool chevrons;
 
+  static const double _gap = 28;
+  static const double _arrowSize = 36;
+  static const double _barPadding = 10;
+
+  /// Height of the whole slider (cards + gap + "← • • • →" bar). Placeholders
+  /// shown while the cards load must use this, or the section grows by the bar
+  /// once data arrives and the page jumps.
+  static double fullHeight(double cardHeight) =>
+      cardHeight + _gap + _arrowSize + _barPadding * 2;
+
   @override
   State<SiteCarousel> createState() => _SiteCarouselState();
 }
@@ -270,8 +280,8 @@ class _SiteCarouselState extends State<SiteCarousel> {
     Widget arrow(bool left) => GestureDetector(
           onTap: () => _to(_index + (left ? -1 : 1)),
           child: Container(
-            width: 36,
-            height: 36,
+            width: SiteCarousel._arrowSize,
+            height: SiteCarousel._arrowSize,
             decoration: BoxDecoration(
               color: Colors.white,
               shape: BoxShape.circle,
@@ -308,9 +318,10 @@ class _SiteCarouselState extends State<SiteCarousel> {
             ),
           ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: SiteCarousel._gap),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(
+              horizontal: 12, vertical: SiteCarousel._barPadding),
           decoration: BoxDecoration(
             color: widget.color.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(30),

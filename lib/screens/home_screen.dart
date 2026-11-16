@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen>
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
           return SizedBox(
-              height: height,
+              height: SiteCarousel.fullHeight(height),
               child: const Center(child: CircularProgressIndicator()));
         }
         final items = snap.data ?? const [];

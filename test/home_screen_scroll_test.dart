@@ -103,7 +103,10 @@ void main() {
     // ignore: avoid_print
     print('frames pulled back down (${back.length}): ${back.take(20).join(' | ')}');
     expect(back, isEmpty);
-    expect(trail.take(trail.length - 1).where((m) => m < 300), isEmpty, reason: 'each 400px drag should move the page ~380px up');
+    // Every drag but the last (which stops at the top) follows the finger:
+    // 380-400px for a 400px drag, no jump from sections rebuilt above.
+    expect(trail.take(trail.length - 1).where((m) => m < 370 || m > 410), isEmpty,
+        reason: 'each 400px drag should move the page ~380-400px up, got $trail');
   });
   }
 }
