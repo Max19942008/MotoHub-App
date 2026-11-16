@@ -97,8 +97,9 @@ void main() {
     final trail = <int>[];
     // index@scrollOffset:height for every child the list has built
     String layout() {
-      final sliver = tester.renderObject<RenderSliverList>(
-          find.descendant(of: find.byType(HomeScreen), matching: find.byType(SliverList)).first);
+      final lists = find.descendant(of: find.byType(HomeScreen), matching: find.byType(SliverList));
+      if (lists.evaluate().isEmpty) return 'pixels ${pos.pixels.round()} max ${pos.maxScrollExtent.round()}';
+      final sliver = tester.renderObject<RenderSliverList>(lists.first);
       final parts = <String>[];
       for (var c = sliver.firstChild; c != null; c = sliver.childAfter(c)) {
         parts.add('${sliver.indexOf(c)}@${sliver.childScrollOffset(c)!.round()}:${c.size.height.round()}');

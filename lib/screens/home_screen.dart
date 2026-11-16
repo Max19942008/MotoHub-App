@@ -158,72 +158,85 @@ class _HomeScreenState extends State<HomeScreen>
     final h = _cardHeight(context);
     return RefreshIndicator(
       onRefresh: _refresh,
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          const HomeHero(),
-          SiteSection(
-            title: "Eng ko'p qidirilgan mototsikllar",
-            subtitle: 'Trend yoqtirishlarga asoslangan',
-            emoji: '🔥',
-            gradient: _greenTitle,
-            underline: Brand.green,
-            child: _carousel(_trend, Brand.green, h,
-                (Motorbike b) => _bikeCard(b, CardAccent.green, 'Sotib Olish')),
-          ),
-          SiteSection(
-            title: 'Ommabop mototsikllar',
-            subtitle: "Shu haftada eng ko'p ko'rilgan mototsikllar",
-            emoji: '🔥  🔥',
-            gradient: _indigoTitle,
-            background: _grey,
-            child: _carousel(
-                _popular,
-                Brand.indigo,
-                h,
-                (Motorbike b) =>
-                    _bikeCard(b, CardAccent.indigo, 'Band Qilish')),
-          ),
-          const AdvertisementVideo(),
-          SiteSection(
-            title: "Eng zo'r mototsikllar",
-            subtitle: 'Shu oyning eng yuqori baholangan mototsikllari',
-            emoji: '🏆  🏆',
-            gradient: _indigoTitle,
-            child: _carousel(
-                _top,
-                Brand.indigo,
-                h,
-                (Motorbike b) =>
-                    _bikeCard(b, CardAccent.indigo, 'Band Qilish')),
-          ),
-          SiteSection(
-            title: "Eng zo'r ehtiyot qismlar",
-            subtitle: 'Shu oyning eng ommabop ehtiyot qismlari',
-            emoji: '🏆  🏆',
-            gradient: _indigoTitle,
-            background: _grey,
-            child: _carousel(_topParts, Brand.indigo, h, _partCard),
-          ),
-          SiteSection(
-            title: "Eng zo'r aksessuarlar",
-            subtitle: 'Shu oyning eng ommabop aksessuarlari',
-            emoji: '🏆  🏆',
-            gradient: _indigoTitle,
-            child: _carousel(_topAccessories, Brand.indigo, h, _partCard),
-          ),
-          SiteSection(
-            title: 'Elita haydovchilar',
-            subtitle: 'Hamjamiyatimiz chempionlari bilan tanishing',
-            emoji: '⭐  ⭐',
-            gradient: _indigoTitle,
-            background: _grey,
-            child: _carousel(
-                _agents, Brand.indigo, 420, (Agent a) => AgentCard(agent: a),
-                chevrons: true),
-          ),
-          const SiteFooter(),
-        ],
+      // A plain scroll view over one Column, not a lazy ListView: the list
+      // drops sections that are far off screen and rebuilds them on the way
+      // back up, and any rebuilt section whose height differs for even one
+      // frame makes the list correct its scroll offset, which throws the user
+      // back down to the footer. Built once, the sections never change height
+      // under the finger. The carousels inside stay lazy, so this is cheap.
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const HomeHero(),
+            SiteSection(
+              title: "Eng ko'p qidirilgan mototsikllar",
+              subtitle: 'Trend yoqtirishlarga asoslangan',
+              emoji: '🔥',
+              gradient: _greenTitle,
+              underline: Brand.green,
+              child: _carousel(
+                  _trend,
+                  Brand.green,
+                  h,
+                  (Motorbike b) =>
+                      _bikeCard(b, CardAccent.green, 'Sotib Olish')),
+            ),
+            SiteSection(
+              title: 'Ommabop mototsikllar',
+              subtitle: "Shu haftada eng ko'p ko'rilgan mototsikllar",
+              emoji: '🔥  🔥',
+              gradient: _indigoTitle,
+              background: _grey,
+              child: _carousel(
+                  _popular,
+                  Brand.indigo,
+                  h,
+                  (Motorbike b) =>
+                      _bikeCard(b, CardAccent.indigo, 'Band Qilish')),
+            ),
+            const AdvertisementVideo(),
+            SiteSection(
+              title: "Eng zo'r mototsikllar",
+              subtitle: 'Shu oyning eng yuqori baholangan mototsikllari',
+              emoji: '🏆  🏆',
+              gradient: _indigoTitle,
+              child: _carousel(
+                  _top,
+                  Brand.indigo,
+                  h,
+                  (Motorbike b) =>
+                      _bikeCard(b, CardAccent.indigo, 'Band Qilish')),
+            ),
+            SiteSection(
+              title: "Eng zo'r ehtiyot qismlar",
+              subtitle: 'Shu oyning eng ommabop ehtiyot qismlari',
+              emoji: '🏆  🏆',
+              gradient: _indigoTitle,
+              background: _grey,
+              child: _carousel(_topParts, Brand.indigo, h, _partCard),
+            ),
+            SiteSection(
+              title: "Eng zo'r aksessuarlar",
+              subtitle: 'Shu oyning eng ommabop aksessuarlari',
+              emoji: '🏆  🏆',
+              gradient: _indigoTitle,
+              child: _carousel(_topAccessories, Brand.indigo, h, _partCard),
+            ),
+            SiteSection(
+              title: 'Elita haydovchilar',
+              subtitle: 'Hamjamiyatimiz chempionlari bilan tanishing',
+              emoji: '⭐  ⭐',
+              gradient: _indigoTitle,
+              background: _grey,
+              child: _carousel(
+                  _agents, Brand.indigo, 420, (Agent a) => AgentCard(agent: a),
+                  chevrons: true),
+            ),
+            const SiteFooter(),
+          ],
+        ),
       ),
     );
   }
