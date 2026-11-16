@@ -34,13 +34,28 @@ class _HomeScreenState extends State<HomeScreen>
     _load();
   }
 
+  /// Finished results by future. The list drops sections far off screen and
+  /// rebuilds them when the user scrolls back; a rebuilt FutureBuilder starts
+  /// in the waiting state for one frame even for a finished future, so the
+  /// section would be drawn at the wrong height (e.g. a full-size spinner for
+  /// the empty accessories carousel) and the page would jump. Rebuilt sections
+  /// read their data from here instead and come back at their real height.
+  final _loaded = <Future<Object>, List<Object>>{};
+
+  Future<List<T>> _remember<T extends Object>(Future<List<T>> future) {
+    future.then((v) => _loaded[future] = v,
+        onError: (Object _) => _loaded[future] = <T>[]);
+    return future;
+  }
+
   void _load() {
-    _trend = _repo.topMotorbikes('propertyLikes', 8);
-    _popular = _repo.topMotorbikes('propertyViews', 7);
-    _top = _repo.topMotorbikes('propertyRank', 8);
-    _topParts = _repo.topParts('SPARE_PART', 8);
-    _topAccessories = _repo.topParts('ACCESSORY', 8);
-    _agents = _repo.topAgents(10);
+    _loaded.clear();
+    _trend = _remember(_repo.topMotorbikes('propertyLikes', 8));
+    _popular = _remember(_repo.topMotorbikes('propertyViews', 7));
+    _top = _remember(_repo.topMotorbikes('propertyRank', 8));
+    _topParts = _remember(_repo.topParts('SPARE_PART', 8));
+    _topAccessories = _remember(_repo.topParts('ACCESSORY', 8));
+    _agents = _remember(_repo.topAgents(10));
   }
 
   Future<void> _refresh() async {
@@ -108,12 +123,16 @@ class _HomeScreenState extends State<HomeScreen>
     return FutureBuilder<List<T>>(
       future: future,
       builder: (context, snap) {
-        if (snap.connectionState != ConnectionState.done) {
+        // Read the remembered result here, at build time: these widgets are
+        // created once, before anything has loaded, so initialData would
+        // stay null forever.
+        final data = snap.data ?? _loaded[future]?.cast<T>();
+        if (data == null && snap.connectionState != ConnectionState.done) {
           return SizedBox(
               height: SiteCarousel.fullHeight(height),
               child: const Center(child: CircularProgressIndicator()));
         }
-        final items = snap.data ?? const [];
+        final items = data ?? const [];
         if (items.isEmpty) {
           return const Padding(
             padding: EdgeInsets.symmetric(vertical: 30),

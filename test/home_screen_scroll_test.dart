@@ -1,14 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:motohub_app/i18n/i18n.dart';
 import 'package:motohub_app/main.dart';
 import 'package:motohub_app/screens/home_screen.dart';
+import 'package:motohub_app/widgets/site_sections.dart';
 
-/// Fake backend: every home carousel gets 8 listings.
+/// Fake backend shaped like the live one: 8 listings per carousel, no accessories.
 http.Client _fakeApi() => MockClient((req) async {
       final q = (jsonDecode(req.body) as Map)['query'] as String;
       Map<String, dynamic> bike(int i) => {
@@ -22,8 +24,10 @@ http.Client _fakeApi() => MockClient((req) async {
       if (!q.contains('getParts') && !q.contains('getAgents') && !q.contains('getProperties')) {
         return http.Response(jsonEncode({'errors': [{'message': 'not faked'}]}), 200);
       }
+      // Like the live database: there are no accessories yet.
+      final accessories = req.body.contains('ACCESSORY');
       final data = q.contains('getParts')
-          ? {'getParts': {'list': List.generate(8, part)}}
+          ? {'getParts': {'list': accessories ? <Object>[] : List.generate(8, part)}}
           : q.contains('getAgents')
               ? {'getAgents': {'list': List.generate(10, agent)}}
               : {'getProperties': {'list': List.generate(8, bike)}};
@@ -53,6 +57,16 @@ void main() {
       }
     }, _fakeApi);
 
+    // ignore: avoid_print
+    print('at start: spinners ${find.byType(CircularProgressIndicator, skipOffstage: false).evaluate().length}');
+    {
+      final rows = <String>[];
+      for (final e in find.byType(SiteSection, skipOffstage: false).evaluate()) {
+        rows.add('${(e.widget as SiteSection).title.substring(0, 12)}=${e.size!.height.round()}');
+      }
+      // ignore: avoid_print
+      print('built at start: ${rows.join(', ')}');
+    }
     final scrollable = tester.state<ScrollableState>(find.descendant(of: find.byType(HomeScreen), matching: find.byType(Scrollable)).first);
     final pos = scrollable.position;
     // Drag down to the footer like a thumb.
@@ -81,10 +95,22 @@ void main() {
     }
     final back = <String>[];
     final trail = <int>[];
+    // index@scrollOffset:height for every child the list has built
+    String layout() {
+      final sliver = tester.renderObject<RenderSliverList>(
+          find.descendant(of: find.byType(HomeScreen), matching: find.byType(SliverList)).first);
+      final parts = <String>[];
+      for (var c = sliver.firstChild; c != null; c = sliver.childAfter(c)) {
+        parts.add('${sliver.indexOf(c)}@${sliver.childScrollOffset(c)!.round()}:${c.size.height.round()}');
+      }
+      return 'pixels ${pos.pixels.round()} max ${pos.maxScrollExtent.round()} [${parts.join(' ')}]';
+    }
+    var lastLayout = '';
     for (var k = 0; k < 40 && pos.pixels > 0; k++) {
       final start = pos.pixels;
       await tester.dragFrom(const Offset(200, 200), const Offset(0, 400));
       var prev = pos.pixels;
+      lastLayout = layout();
       for (var f = 0; f < 30; f++) {
         await tester.pump(const Duration(milliseconds: 16));
         if (focusFooter && f == 20) {
@@ -92,7 +118,28 @@ void main() {
           tester.view.viewInsets = FakeViewPadding(bottom: 800.0 + (k.isEven ? 1 : 0));
         }
         final now = pos.pixels;
-        if (now > prev + 0.5) back.add('drag $k frame $f: ${prev.round()} -> ${now.round()}');
+        if (now > prev + 0.5) {
+          back.add('drag $k frame $f: ${prev.round()} -> ${now.round()}');
+          if (back.length <= 3) {
+            // Which list children exist now, and how tall is each?
+            final rows = <String>[];
+            for (final e in find.byType(SiteSection).evaluate()) {
+              final w = e.widget as SiteSection;
+              rows.add('${w.title.substring(0, 12)}=${e.size!.height.round()}');
+            }
+            for (final e in find.byType(HomeHero).evaluate()) {
+              rows.add('hero=${e.size!.height.round()}');
+            }
+            // ignore: avoid_print
+            print('  pullback ${back.length}: ${prev.round()} -> ${now.round()} built: ${rows.join(', ')}');
+            // ignore: avoid_print
+            print('    before: $lastLayout');
+            // ignore: avoid_print
+            print('    after:  ${layout()}');
+            // ignore: avoid_print
+            print('    spinners ${find.byType(CircularProgressIndicator, skipOffstage: false).evaluate().length}, empty-texts ${find.textContaining("bo'sh", skipOffstage: false).evaluate().length}, carousels ${find.byType(SiteCarousel, skipOffstage: false).evaluate().length}, sections ${find.byType(SiteSection, skipOffstage: false).evaluate().map((e) => "${(e.widget as SiteSection).title.substring(0, 8)}=${e.size!.height.round()}").join(" ")}');
+          }
+        }
         prev = now;
       }
       await tester.pumpAndSettle();
