@@ -67,7 +67,8 @@ class _HomeScreenState extends State<HomeScreen>
   static const _indigoTitle = [Brand.indigo, Color(0xFF8B5CF6)];
   static const _grey = Color(0xFFF5F5F5);
 
-  /// Card height in a carousel: photo (16:10) + body.
+  /// Rough card height (photo 16:10 + body), only for the loading spinner's
+  /// box; once loaded, the carousel takes the card's real height.
   double _cardHeight(BuildContext context) =>
       (MediaQuery.sizeOf(context).width - 24) * 10 / 16 + 360;
 
@@ -85,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen>
         likes: b.likes,
         accent: accent,
         action: action,
+        titleLines: 1,
         chips: [
           CardChip(Icons.speed, '${b.mileage} milya'),
           CardChip(Icons.two_wheeler, b.condition),
@@ -108,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen>
         likes: p.likes,
         accent: CardAccent.indigo,
         action: 'Sotib Olish',
+        titleLines: 1,
         chips: [
           CardChip(Icons.category_outlined, p.type),
           CardChip(Icons.two_wheeler, p.condition),
@@ -119,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _carousel<T>(Future<List<T>> future, Color color, double height,
       Widget Function(T) card,
-      {bool chevrons = false}) {
+      {bool chevrons = false, bool fixedHeight = false}) {
     return FutureBuilder<List<T>>(
       future: future,
       builder: (context, snap) {
@@ -143,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen>
         }
         return SiteCarousel(
           itemCount: items.length,
-          height: height,
+          height: fixedHeight ? height : null,
           color: color,
           chevrons: chevrons,
           itemBuilder: (context, i) => card(items[i]),
@@ -232,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen>
               background: _grey,
               child: _carousel(
                   _agents, Brand.indigo, 420, (Agent a) => AgentCard(agent: a),
-                  chevrons: true),
+                  chevrons: true, fixedHeight: true),
             ),
             const SiteFooter(),
           ],

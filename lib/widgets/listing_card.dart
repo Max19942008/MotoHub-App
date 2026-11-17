@@ -53,6 +53,7 @@ class ListingCard extends StatelessWidget {
     this.likes,
     this.action = 'Sotib Olish',
     this.priceLabel = 'DAN',
+    this.titleLines = 2,
     this.accent = CardAccent.green,
     required this.onTap,
   });
@@ -79,6 +80,9 @@ class ListingCard extends StatelessWidget {
 
   /// "DAN" on bikes, "NARX" on parts (as on the site).
   final String priceLabel;
+
+  /// 1 in carousels, so every card there has the same height.
+  final int titleLines;
   final CardAccent accent;
   final VoidCallback onTap;
 
@@ -137,7 +141,7 @@ class ListingCard extends StatelessWidget {
                           children: [
                             Text(
                               title,
-                              maxLines: 2,
+                              maxLines: titleLines,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                   fontSize: 17,

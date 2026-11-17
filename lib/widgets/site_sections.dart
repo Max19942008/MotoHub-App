@@ -235,14 +235,19 @@ class SiteCarousel extends StatefulWidget {
     super.key,
     required this.itemCount,
     required this.itemBuilder,
-    required this.height,
+    this.height,
     required this.color,
     this.chevrons = false,
   });
 
   final int itemCount;
   final IndexedWidgetBuilder itemBuilder;
-  final double height;
+
+  /// Fixed card height, or null to make the slider exactly as tall as the
+  /// first card. A fixed guess leaves empty space under shorter cards (and
+  /// gets it wrong when the phone uses a bigger font), so cards whose height
+  /// doesn't depend on their data should leave this null.
+  final double? height;
   final Color color;
 
   /// The agents slider uses ‹ › instead of arrows.
@@ -304,20 +309,42 @@ class _SiteCarouselState extends State<SiteCarousel> {
           ),
         );
 
+    final pages = PageView.builder(
+      controller: _pages,
+      itemCount: widget.itemCount,
+      onPageChanged: (i) => setState(() => _index = i),
+      itemBuilder: (context, i) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2),
+        child: widget.itemBuilder(context, i),
+      ),
+    );
+
     return Column(
       children: [
-        SizedBox(
-          height: widget.height,
-          child: PageView.builder(
-            controller: _pages,
-            itemCount: widget.itemCount,
-            onPageChanged: (i) => setState(() => _index = i),
-            itemBuilder: (context, i) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2),
-              child: widget.itemBuilder(context, i),
-            ),
+        if (widget.height != null)
+          SizedBox(height: widget.height, child: pages)
+        else
+          // An invisible copy of the first card gives the slider its height;
+          // the real pages are laid over it.
+          Stack(
+            children: [
+              IgnorePointer(
+                child: ExcludeSemantics(
+                  child: HeroMode(
+                    enabled: false,
+                    child: Opacity(
+                      opacity: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: widget.itemBuilder(context, 0),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned.fill(child: pages),
+            ],
           ),
-        ),
         const SizedBox(height: SiteCarousel._gap),
         Container(
           padding: const EdgeInsets.symmetric(
@@ -608,7 +635,8 @@ class SiteFooter extends StatelessWidget {
                   // every keyboard resize, so a phone user who touched this box
                   // could never scroll up past the footer again. Touching
                   // anywhere else (including starting a scroll) lets go of it.
-                  onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                  onTapOutside: (_) =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: 'Email manzilingizni kiriting'.tr,
