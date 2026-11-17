@@ -17,6 +17,7 @@ import 'screens/parts_screen.dart';
 import 'screens/profile_screen.dart';
 import 'theme.dart';
 import 'widgets/common.dart';
+import 'widgets/live_chat.dart';
 import 'i18n/i18n.dart';
 import 'i18n/text.dart';
 
@@ -113,20 +114,35 @@ class _HomeShellState extends State<HomeShell> {
                 auth.logout();
               },
             ),
-            body: IndexedStack(
-              index: _page.index,
+            body: Stack(
               children: [
-                const HomeScreen(),
-                const MotorbikesScreen(),
-                PartsScreen(
-                  category: _partsCategory,
-                  onCategoryChanged: (c) => _partsCategory = c,
+                Positioned.fill(
+                  child: IndexedStack(
+                    index: _page.index,
+                    children: [
+                      const HomeScreen(),
+                      const MotorbikesScreen(),
+                      PartsScreen(
+                        category: _partsCategory,
+                        onCategoryChanged: (c) => _partsCategory = c,
+                      ),
+                      const AgentsScreen(),
+                      const CommunityScreen(),
+                      const HelpScreen(),
+                      const AssistantScreen(),
+                      const ProfileScreen(),
+                    ],
+                  ),
                 ),
-                const AgentsScreen(),
-                const CommunityScreen(),
-                const HelpScreen(),
-                const AssistantScreen(),
-                const ProfileScreen(),
+                // The site's live chat, bottom right on every page that has
+                // the AI Assistant pill bottom left. Kept alive (Offstage)
+                // on the assistant page so an open chat stays open.
+                Positioned.fill(
+                  child: Offstage(
+                    offstage: _page == AppPage.assistant,
+                    child: const LiveChat(),
+                  ),
+                ),
               ],
             ),
             floatingActionButtonLocation:

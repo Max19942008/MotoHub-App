@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:motohub_app/api/chat_service.dart';
 import 'package:motohub_app/i18n/i18n.dart';
 import 'package:motohub_app/main.dart';
 import 'package:motohub_app/screens/home_screen.dart';
@@ -155,6 +156,10 @@ void main() {
     // 380-400px for a 400px drag, no jump from sections rebuilt above.
     expect(trail.take(trail.length - 1).where((m) => m < 370 || m > 410), isEmpty,
         reason: 'each 400px drag should move the page ~380-400px up, got $trail');
+    // The shell's live chat tried to reach the (absent) server; stop its
+    // reconnect timer before the test ends.
+    await tester.pumpWidget(const SizedBox());
+    ChatService.instance.debugReset();
   });
   }
 }
